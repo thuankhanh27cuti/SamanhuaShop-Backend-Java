@@ -46,10 +46,10 @@ public class SecurityConfig {
                 })
                 .authorizeHttpRequests(requestMatcherRegistry ->
                         requestMatcherRegistry
-                                .requestMatchers("/api/v1/admin")
-                                .hasAnyRole("OWNER", "ADMIN")
-                                .requestMatchers("/api/v1/admin/**")
-                                .hasAnyRole("OWNER", "ADMIN")
+//                                .requestMatchers("/api/v1/admin")
+//                                .hasAnyRole("OWNER", "ADMIN")
+//                                .requestMatchers("/api/v1/admin/**")
+//                                .hasAnyRole("OWNER", "ADMIN")
                                 .anyRequest()
                                 .permitAll()
                 )

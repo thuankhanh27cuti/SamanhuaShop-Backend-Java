@@ -1,11 +1,16 @@
 package local.kc.springdatajpa.services;
 
 import local.kc.springdatajpa.dtos.CustomerDTO;
+import local.kc.springdatajpa.models.Customer;
+import local.kc.springdatajpa.models.Role;
 import local.kc.springdatajpa.repositories.CustomerRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class CustomerService {
@@ -24,5 +29,21 @@ public class CustomerService {
                 .map(customer -> modelMapper.map(customer, CustomerDTO.class))
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.noContent().build());
+    }
+
+    public ResponseEntity<?> findAll(Pageable pageable) {
+        return ResponseEntity.ok(customerRepository.findAllLazy(pageable));
+    }
+
+    public ResponseEntity<?> count() {
+        return ResponseEntity.ok(customerRepository.count());
+    }
+
+    public ResponseEntity<?> findByRoles(Role role, Pageable pageable) {
+        return ResponseEntity.ok(customerRepository.findByRoles(role, pageable));
+    }
+
+    public ResponseEntity<?> countByRole(Role role) {
+        return ResponseEntity.ok(customerRepository.countByRole(role));
     }
 }

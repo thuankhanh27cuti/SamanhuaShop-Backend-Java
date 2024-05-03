@@ -8,8 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 @Repository
@@ -84,13 +87,20 @@ public class GenericRepository {
     public List<RevenueByDate> getRevenueByWeek() {
         String sql = """
                 SELECT CAST(order_created_at AS DATE ) AS date, SUM(order_total_price) AS revenue FROM orders
-                    LEFT JOIN samanhua_shop_jpa_v2_test.order_detail od on orders.order_id = od.order_id
-                WHERE CAST(order_created_at AS DATE ) BETWEEN CURRENT_DATE - 7 AND CURRENT_DATE
+                   LEFT JOIN samanhua_shop_jpa_v2_test.order_detail od on orders.order_id = od.order_id
+                WHERE CAST(order_created_at AS DATE ) BETWEEN DATE_SUB(CURRENT_DATE, INTERVAL 7 DAY ) AND CURRENT_DATE
                 GROUP BY date;
                 """;
         return jdbcTemplate.query(sql, (rs, rowNum) -> RevenueByDate.builder()
                 .revenue(rs.getInt("revenue"))
                 .date(rs.getDate("date"))
                 .build());
+    }
+
+    public List<String> getAllRoles() {
+        String sql = """
+                SELECT DISTINCT customer_role FROM customers;
+                """;
+        return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getString("customer_role"));
     }
 }
