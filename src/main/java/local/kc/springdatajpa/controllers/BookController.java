@@ -2,7 +2,6 @@ package local.kc.springdatajpa.controllers;
 
 import local.kc.springdatajpa.services.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,26 +47,5 @@ public class BookController {
     @GetMapping("/count/by-category/{id}")
     public ResponseEntity<?> countByCategoryId(@PathVariable(name = "id") int categoryId) {
         return bookService.countByCategoryId(categoryId);
-    }
-
-    @GetMapping("/top-seller")
-    public ResponseEntity<?> getTopSeller(Pageable pageable) {
-        Pageable pageRequest = PageRequest.of(0, 5, pageable.getSort());
-        return bookService.getTopSeller(pageRequest);
-    }
-
-    @GetMapping("/book-status")
-    public ResponseEntity<?> getBookStatus() {
-        return bookService.getBookStatus();
-    }
-
-    @GetMapping("/today-featured")
-    public ResponseEntity<?> getTodayFeatured() {
-        return bookService.getTodayFeatured();
-    }
-
-    @GetMapping("/revenue-by-week")
-    public ResponseEntity<?> getRevenueByWeek() {
-        return bookService.getRevenueByWeek();
     }
 }

@@ -2,17 +2,15 @@ package local.kc.springdatajpa.repositories;
 
 import local.kc.springdatajpa.models.Book;
 import local.kc.springdatajpa.utils.BookStatus;
+import local.kc.springdatajpa.utils.QueryBuilder;
 import local.kc.springdatajpa.utils.RevenueByDate;
 import local.kc.springdatajpa.utils.TopSellerBook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 @Repository
@@ -26,23 +24,15 @@ public class GenericRepository {
 
     public List<TopSellerBook> getTopSeller(Pageable pageable) {
         Sort sort = pageable.getSort();
-
-        StringBuilder stringBuilder = new StringBuilder("SELECT b.book_id AS id, b.book_name AS name, b.book_image AS image, SUM(od.option_quantity) AS quantity, SUM(od.option_quantity) * b.book_price AS revenue FROM order_detail od LEFT JOIN options o on o.option_id = od.option_id LEFT JOIN books b on b.book_id = o.book_id GROUP BY id");
-        if (sort.isSorted()) {
-            stringBuilder.append(" ORDER BY ");
-            sort.forEach(order -> {
-                String property = order.getProperty();
-                String direction = order.getDirection().name();
-                stringBuilder
-                        .append(property)
-                        .append(" ")
-                        .append(direction)
-                        .append(", ");
-            });
-            stringBuilder.delete(stringBuilder.length() - 2, stringBuilder.length());
-        }
-        stringBuilder.append(" LIMIT 5");
-        return jdbcTemplate.query(stringBuilder.toString(), (rs, rowNum) -> new TopSellerBook(
+        String sql = """
+                SELECT b.book_id AS id, b.book_name AS name, b.book_image AS image, SUM(od.option_quantity) AS quantity, SUM(od.option_quantity) * b.book_price AS revenue FROM order_detail od LEFT JOIN options o on o.option_id = od.option_id LEFT JOIN books b on b.book_id = o.book_id GROUP BY id
+                """;
+        String build = new QueryBuilder.Builder()
+                .select(sql)
+                .sorted(sort)
+                .limit(0, 5)
+                .build();
+        return jdbcTemplate.query(build, (rs, rowNum) -> new TopSellerBook(
                 rs.getInt("id"),
                 rs.getString("name"),
                 rs.getString("image"),
@@ -95,12 +85,5 @@ public class GenericRepository {
                 .revenue(rs.getInt("revenue"))
                 .date(rs.getDate("date"))
                 .build());
-    }
-
-    public List<String> getAllRoles() {
-        String sql = """
-                SELECT DISTINCT customer_role FROM customers;
-                """;
-        return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getString("customer_role"));
     }
 }

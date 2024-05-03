@@ -21,7 +21,7 @@ public class GenericRepositoryTest {
 
     @Test
     void getTopSeller() {
-        Sort.Order order = Sort.Order.asc("quantity");
+        Sort.Order order = Sort.Order.desc("quantity");
         Sort.Order order1 = Sort.Order.desc("revenue");
         Sort sort = Sort.by(order, order1);
         Pageable pageable = PageRequest.of(0, 5, sort);
