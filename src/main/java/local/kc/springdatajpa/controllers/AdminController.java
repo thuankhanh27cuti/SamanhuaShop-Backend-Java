@@ -1,18 +1,18 @@
 package local.kc.springdatajpa.controllers;
 
+import local.kc.springdatajpa.models.Role;
 import local.kc.springdatajpa.services.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/admin")
-@PreAuthorize("permitAll()")
 public class AdminController {
     private final AdminService adminService;
 
@@ -45,5 +45,15 @@ public class AdminController {
     @GetMapping("/revenue-by-week")
     public ResponseEntity<?> getRevenueByWeek() {
         return adminService.getRevenueByWeek();
+    }
+
+    @GetMapping("/customer-statistical")
+    public ResponseEntity<?> getCustomerStatistical(Pageable pageable) {
+        return adminService.getCustomerStatistical(pageable);
+    }
+
+    @GetMapping("/customer-statistical/by-role/{role}")
+    public ResponseEntity<?> getCustomerStatisticalByRole(@PathVariable(name = "role") Role role, Pageable pageable) {
+        return adminService.getCustomerStatisticalByRole(role, pageable);
     }
 }

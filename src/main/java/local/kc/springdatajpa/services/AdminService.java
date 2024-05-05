@@ -35,4 +35,13 @@ public class AdminService {
     public ResponseEntity<?> getRevenueByWeek() {
         return ResponseEntity.ok(genericRepository.getRevenueByWeek());
     }
+
+    public ResponseEntity<?> getCustomerStatistical(Pageable pageable) {
+        return ResponseEntity.ok(genericRepository.getCustomerStatistical(pageable));
+    }
+
+    public ResponseEntity<?> getCustomerStatisticalByRole(Role role, Pageable pageable) {
+        return ResponseEntity.ok(genericRepository.getCustomerStatistical(role, pageable));
+
+    }
 }

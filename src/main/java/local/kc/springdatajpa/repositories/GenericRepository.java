@@ -1,16 +1,15 @@
 package local.kc.springdatajpa.repositories;
 
 import local.kc.springdatajpa.models.Book;
-import local.kc.springdatajpa.utils.BookStatus;
-import local.kc.springdatajpa.utils.QueryBuilder;
-import local.kc.springdatajpa.utils.RevenueByDate;
-import local.kc.springdatajpa.utils.TopSellerBook;
+import local.kc.springdatajpa.models.Role;
+import local.kc.springdatajpa.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -85,5 +84,68 @@ public class GenericRepository {
                 .revenue(rs.getInt("revenue"))
                 .date(rs.getDate("date"))
                 .build());
+    }
+
+    public List<CustomerStatistical> getCustomerStatistical(Pageable pageable) {
+        return getCustomerStatistical(null, pageable);
+    }
+
+    public List<CustomerStatistical> getCustomerStatistical(Role role, Pageable pageable) {
+        List<Object> args = new ArrayList<>();
+        String sql = """
+                SELECT c.customer_id AS customer_id,
+                       customer_gender AS gender,
+                       customer_image AS image,
+                       customer_full_name AS full_name,
+                       customer_phone AS phone,
+                       customer_role AS role,
+                       customer_username AS username,
+                       COUNT(IF(order_status = 'PENDING', o.order_id, null)) AS order_remain,
+                       COUNT(IF(order_status = 'SHIPPING', o.order_id, null)) AS order_shipping,
+                       COUNT(IF(order_status = 'SUCCESS', o.order_id, null)) AS order_success,
+                       COUNT(order_id) AS count_order,
+                       MAX(IF(order_status = 'PENDING', order_created_at, null)) AS last_pending,
+                       (SELECT SUM(od2.order_total_price)
+                        FROM customers c2
+                                 LEFT JOIN orders o2 ON c2.customer_id = o2.customer_id
+                                 LEFT JOIN order_detail od2 ON o2.order_id = od2.order_id
+                        WHERE c2.customer_id = c.customer_id
+                        GROUP BY c2.customer_id) AS total_price
+                FROM customers c
+                        LEFT JOIN orders o on c.customer_id = o.customer_id
+        """;
+        if (role != null) {
+            sql = sql + """
+                WHERE customer_role = ?
+                """;
+            args.add(role.name());
+        }
+        sql = sql + """
+                GROUP BY c.customer_id
+                """;
+        Sort sort = pageable.getSort();
+        int pageNumber = pageable.getPageNumber();
+        int pageSize = pageable.getPageSize();
+        int start = pageNumber * pageSize;
+        String build = new QueryBuilder.Builder()
+                .select(sql)
+                .sorted(sort)
+                .limit(start, pageSize)
+                .build();
+        return jdbcTemplate.query(build, (rs, rowNum) -> CustomerStatistical.builder()
+                .id(rs.getInt("customer_id"))
+                .gender(rs.getString("gender"))
+                .image(rs.getString("image"))
+                .fullName(rs.getString("full_name"))
+                .phone(rs.getString("phone"))
+                .role(Role.valueOf(rs.getString("role")))
+                .username(rs.getString("username"))
+                .orderRemain(rs.getInt("order_remain"))
+                .orderShipping(rs.getInt("order_shipping"))
+                .orderSuccess(rs.getInt("order_success"))
+                .countOrder(rs.getInt("count_order"))
+                .lastPending(rs.getDate("last_pending"))
+                .totalPrice(rs.getFloat("total_price"))
+                .build(), args.toArray());
     }
 }

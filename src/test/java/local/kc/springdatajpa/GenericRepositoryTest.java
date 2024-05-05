@@ -2,6 +2,7 @@ package local.kc.springdatajpa;
 
 import local.kc.springdatajpa.repositories.GenericRepository;
 import local.kc.springdatajpa.utils.BookStatus;
+import local.kc.springdatajpa.utils.CustomerStatistical;
 import local.kc.springdatajpa.utils.RevenueByDate;
 import local.kc.springdatajpa.utils.TopSellerBook;
 import org.junit.jupiter.api.Test;
@@ -39,5 +40,16 @@ public class GenericRepositoryTest {
     void getRevenueByWeek() {
         List<RevenueByDate> revenueByWeek = genericRepository.getRevenueByWeek();
         System.out.println(revenueByWeek);
+    }
+
+    @Test
+    void getCustomerStatistical() {
+        Sort.Order order = Sort.Order.desc("last_pending");
+        Sort.Order order1 = Sort.Order.asc("customer_id");
+        Sort sort = Sort.by(order, order1);
+        System.out.println(sort);
+        Pageable pageable = PageRequest.of(0, 5, sort);
+        List<CustomerStatistical> customerStatistical = genericRepository.getCustomerStatistical(pageable);
+        customerStatistical.forEach(System.out::println);
     }
 }
