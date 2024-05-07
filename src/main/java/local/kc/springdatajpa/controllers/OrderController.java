@@ -1,8 +1,10 @@
 package local.kc.springdatajpa.controllers;
 
 import local.kc.springdatajpa.dtos.OrderDTO;
+import local.kc.springdatajpa.models.OrderStatus;
 import local.kc.springdatajpa.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -17,14 +19,54 @@ public class OrderController {
         this.orderService = orderService;
     }
 
+    @GetMapping
+    public ResponseEntity<?> findAll(Pageable pageable) {
+        return orderService.findAll(pageable);
+    }
+
+    @GetMapping("/by-customer/{id}")
+    public ResponseEntity<?> findByCustomerId(@PathVariable(name = "id") int id, Pageable pageable) {
+        return orderService.findByCustomerId(id, pageable);
+    }
+
+    @GetMapping("/by-customer-lazy/{id}")
+    public ResponseEntity<?> findByCustomerIdLazy(@PathVariable(name = "id") int id, Pageable pageable) {
+        return orderService.findByCustomerIdLazy(id, pageable);
+    }
+
+    @GetMapping("/by-customer-lazy/{id}/by-status/{status}")
+    public ResponseEntity<?> findByCustomerIdLazyAndStatus(@PathVariable(name = "id") int id, @PathVariable(name = "status") OrderStatus status, Pageable pageable) {
+        return orderService.findByCustomerIdLazyAndStatus(id, status, pageable);
+    }
+
+    @GetMapping("/by-status/{status}")
+    public ResponseEntity<?> findByOrderStatus(@PathVariable(name = "status") OrderStatus status, Pageable pageable) {
+        return orderService.findByOrderStatus(status, pageable);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable(name = "id") int id) {
         return orderService.findById(id);
     }
 
-    @GetMapping("/by-customer/{id}")
-    public ResponseEntity<?> findOrderByCustomerId(@PathVariable(name = "id") int id) {
-        return orderService.findOrderByCustomerId(id);
+    @GetMapping("/count")
+    public ResponseEntity<?> count() {
+        return orderService.count();
+    }
+
+    @GetMapping("/count/by-status/{status}")
+    public ResponseEntity<?> countByStatus(@PathVariable(name = "status") OrderStatus status) {
+        return orderService.countByStatus(status);
+    }
+
+    @GetMapping("/count/by-customer/{id}")
+    public ResponseEntity<?> countByCustomerId(@PathVariable(name = "id") int id) {
+        return orderService.countByCustomerId(id);
+    }
+
+    @GetMapping("/count/by-customer/{id}/by-status/{status}")
+    public ResponseEntity<?> countByCustomerIdAndStatusStatus(@PathVariable(name = "id") int id, @PathVariable(name = "status") OrderStatus status) {
+        return orderService.countByCustomerIdAndStatusStatus(id, status);
     }
 
     @PreAuthorize(value = "isAuthenticated()")

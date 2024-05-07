@@ -7,6 +7,7 @@ import local.kc.springdatajpa.repositories.OrderDetailRepository;
 import local.kc.springdatajpa.repositories.OrderRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -34,9 +35,33 @@ public class OrderService {
         this.orderDetailRepository = orderDetailRepository;
     }
 
-    public ResponseEntity<?> findOrderByCustomerId(int id) {
+    public ResponseEntity<?> findAll(Pageable pageable) {
+        return ResponseEntity.ok(orderRepository.findAllLazy(pageable)
+                .stream()
+                .peek(order -> {
+                    order.setOrderDetails(null);
+                    Customer customer = order.getCustomer();
+                    customer.setOrders(new HashSet<>(Set.of(order)));
+                })
+                .map(order -> modelMapper.map(order, OrderDTO.class))
+                .toList());
+    }
+
+    public ResponseEntity<?> findByOrderStatus(OrderStatus status, Pageable pageable) {
+        return ResponseEntity.ok(orderRepository.findByOrderStatusLazy(status, pageable)
+                .stream()
+                .peek(order -> {
+                    order.setOrderDetails(null);
+                    Customer customer = order.getCustomer();
+                    customer.setOrders(new HashSet<>(Set.of(order)));
+                })
+                .map(order -> modelMapper.map(order, OrderDTO.class))
+                .toList());
+    }
+
+    public ResponseEntity<?> findByCustomerId(int id, Pageable pageable) {
         return ResponseEntity
-                .ok(orderRepository.findByCustomerIdLazy(id).stream()
+                .ok(orderRepository.findByCustomerIdLazy(id, pageable).stream()
                         .peek(order -> {
                             Set<OrderDetail> orderDetails = orderDetailRepository.findByOrderId(order.getId());
                             Set<OrderDetail> set = orderDetails.stream()
@@ -44,6 +69,20 @@ public class OrderService {
                                     .collect(Collectors.toSet());
                             order.setOrderDetails(set);
                         })
+                        .map(order -> modelMapper.map(order, OrderDTO.class))
+                        .toList());
+    }
+
+    public ResponseEntity<?> findByCustomerIdLazy(int id, Pageable pageable) {
+        return ResponseEntity
+                .ok(orderRepository.findByCustomerIdLazy(id, pageable).stream()
+                        .map(order -> modelMapper.map(order, OrderDTO.class))
+                        .toList());
+    }
+
+    public ResponseEntity<?> findByCustomerIdLazyAndStatus(int id, OrderStatus status, Pageable pageable) {
+        return ResponseEntity
+                .ok(orderRepository.findByCustomerIdLazyAndStatus(id, status, pageable).stream()
                         .map(order -> modelMapper.map(order, OrderDTO.class))
                         .toList());
     }
@@ -92,4 +131,20 @@ public class OrderService {
         orderDetail.setOption(option);
         orderDetail.setOrder(null);
     };
+
+    public ResponseEntity<?> count() {
+        return ResponseEntity.ok(orderRepository.count());
+    }
+
+    public ResponseEntity<?> countByStatus(OrderStatus status) {
+        return ResponseEntity.ok(orderRepository.countByStatus(status));
+    }
+
+    public ResponseEntity<?> countByCustomerId(int id) {
+        return ResponseEntity.ok(orderRepository.countByCustomerId(id));
+    }
+
+    public ResponseEntity<?> countByCustomerIdAndStatusStatus(int id, OrderStatus status) {
+        return ResponseEntity.ok(orderRepository.countByCustomerIdAndStatus(id, status));
+    }
 }

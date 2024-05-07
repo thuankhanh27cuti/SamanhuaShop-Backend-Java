@@ -144,7 +144,7 @@ public class GenericRepository {
                 .orderShipping(rs.getInt("order_shipping"))
                 .orderSuccess(rs.getInt("order_success"))
                 .countOrder(rs.getInt("count_order"))
-                .lastPending(rs.getDate("last_pending"))
+                .lastPending(rs.getTimestamp("last_pending"))
                 .totalPrice(rs.getFloat("total_price"))
                 .build(), args.toArray());
     }
