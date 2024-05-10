@@ -57,4 +57,8 @@ public class OrderDetailService {
                 .collect(Collectors.toSet());
         return ResponseEntity.ok(orderDetailDTOS);
     }
+
+    public ResponseEntity<?> countByOrderId(int id) {
+        return ResponseEntity.ok(orderDetailRepository.countByOrderId(id));
+    }
 }

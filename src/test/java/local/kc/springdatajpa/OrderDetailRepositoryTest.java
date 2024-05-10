@@ -23,4 +23,9 @@ public class OrderDetailRepositoryTest {
             System.out.println(orderDetail.getOption().getBook());
         });
     }
+    @Test
+    void countByOrderId() {
+        long l = orderDetailRepository.countByOrderId(1);
+        System.out.println(l);
+    }
 }

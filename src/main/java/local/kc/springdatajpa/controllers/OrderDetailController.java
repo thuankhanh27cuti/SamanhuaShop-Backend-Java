@@ -27,4 +27,9 @@ public class OrderDetailController {
     public ResponseEntity<?> findByOrderId(@PathVariable(name = "id") int id) {
         return orderDetailService.findByOrderId(id);
     }
+
+    @GetMapping("/count/by-order/{id}")
+    public ResponseEntity<?> countByOrderId(@PathVariable(name = "id") int id) {
+        return orderDetailService.countByOrderId(id);
+    }
 }
