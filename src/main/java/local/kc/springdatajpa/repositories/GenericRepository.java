@@ -3,12 +3,14 @@ package local.kc.springdatajpa.repositories;
 import local.kc.springdatajpa.models.Book;
 import local.kc.springdatajpa.models.Role;
 import local.kc.springdatajpa.utils.*;
+import local.kc.springdatajpa.utils.RevenueByHour;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -147,5 +149,55 @@ public class GenericRepository {
                 .lastPending(rs.getTimestamp("last_pending"))
                 .totalPrice(rs.getFloat("total_price"))
                 .build(), args.toArray());
+    }
+
+    public List<RevenueByDate> getRevenueByMonth(int month, int year) {
+        String sql = """
+                SELECT CAST(order_created_at AS DATE ) as date , SUM(order_total_price) as totalPrice FROM orders o
+                    LEFT JOIN order_detail od on o.order_id = od.order_id
+                WHERE MONTH(order_created_at) = ? AND YEAR(order_created_at) = ?
+                GROUP BY date;
+        """;
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new RevenueByDate(rs.getDate("date"), rs.getInt("totalPrice")), month, year);
+    }
+
+    public List<RevenueByHour> getRevenueByDate(LocalDate date) {
+        String sql = """
+            SELECT HOUR(order_created_at) as hour, SUM(order_total_price) as revenue FROM orders o
+            LEFT JOIN order_detail od on o.order_id = od.order_id
+            WHERE CAST(order_created_at as DATE) = ?
+            GROUP BY HOUR(order_created_at);
+        """;
+        return jdbcTemplate.query(sql, (rs, rowNum) -> RevenueByHour.builder()
+                .hour(rs.getInt("hour"))
+                .revenue(rs.getInt("revenue"))
+                .build(), date.toString());
+    }
+
+    public List<RevenueByMonth> getRevenueByYear(int year) {
+        String sql = """
+        SELECT MONTH(order_created_at) as month, YEAR(order_created_at) as year, SUM(order_total_price) as totalPrice
+        FROM orders
+            LEFT JOIN order_detail od on orders.order_id = od.order_id
+        WHERE YEAR(order_created_at) = ?
+        GROUP BY month, year;
+        """;
+        return jdbcTemplate.query(sql, ((rs, rowNum) -> RevenueByMonth.builder()
+                .month(rs.getInt("month"))
+                .year(rs.getInt("year"))
+                .revenue(rs.getInt("totalPrice"))
+                .build()), year);
+    }
+
+    public List<RevenueByYear> getRevenueAllTime() {
+        String sql = """
+            SELECT YEAR(order_created_at) as year, SUM(order_total_price) as revenue FROM orders
+            LEFT JOIN order_detail od on orders.order_id = od.order_id
+            GROUP BY year;
+        """;
+        return jdbcTemplate.query(sql, (rs, rowNum) -> RevenueByYear.builder()
+                .year(rs.getInt("year"))
+                .revenue(rs.getInt("revenue"))
+                .build());
     }
 }

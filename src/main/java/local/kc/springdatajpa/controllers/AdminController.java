@@ -6,10 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/v1/admin")
@@ -42,9 +41,30 @@ public class AdminController {
         return adminService.getTodayFeatured();
     }
 
+    @GetMapping("/revenue-by-date")
+    public ResponseEntity<?> getRevenueByDate(@RequestParam(name = "date") LocalDate date) {
+        System.out.println(date);
+        return adminService.getRevenueByDate(date);
+    }
+
     @GetMapping("/revenue-by-week")
     public ResponseEntity<?> getRevenueByWeek() {
         return adminService.getRevenueByWeek();
+    }
+
+    @GetMapping("/revenue-by-month")
+    public ResponseEntity<?> getRevenueByMonth(@RequestParam(name = "month") int month, @RequestParam(name = "year") int year) {
+        return adminService.getRevenueByMonth(month, year);
+    }
+
+    @GetMapping("/revenue-by-year")
+    public ResponseEntity<?> getRevenueByYear(@RequestParam(name = "year") int year) {
+        return adminService.getRevenueByYear(year);
+    }
+
+    @GetMapping("/revenue-all-time")
+    public ResponseEntity<?> getRevenueAllTime() {
+        return adminService.getRevenueAllTime();
     }
 
     @GetMapping("/customer-statistical")

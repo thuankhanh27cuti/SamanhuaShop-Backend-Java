@@ -7,6 +7,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.Date;
+
 @Service
 public class AdminService {
     private final GenericRepository genericRepository;
@@ -43,5 +46,21 @@ public class AdminService {
     public ResponseEntity<?> getCustomerStatisticalByRole(Role role, Pageable pageable) {
         return ResponseEntity.ok(genericRepository.getCustomerStatistical(role, pageable));
 
+    }
+
+    public ResponseEntity<?> getRevenueByMonth(int month, int year) {
+        return ResponseEntity.ok(genericRepository.getRevenueByMonth(month, year));
+    }
+
+    public ResponseEntity<?> getRevenueByDate(LocalDate date) {
+        return ResponseEntity.ok(genericRepository.getRevenueByDate(date));
+    }
+
+    public ResponseEntity<?> getRevenueByYear(int year) {
+        return ResponseEntity.ok(genericRepository.getRevenueByYear(year));
+    }
+
+    public ResponseEntity<?> getRevenueAllTime() {
+        return ResponseEntity.ok(genericRepository.getRevenueAllTime());
     }
 }

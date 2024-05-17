@@ -1,10 +1,7 @@
 package local.kc.springdatajpa;
 
 import local.kc.springdatajpa.repositories.GenericRepository;
-import local.kc.springdatajpa.utils.BookStatus;
-import local.kc.springdatajpa.utils.CustomerStatistical;
-import local.kc.springdatajpa.utils.RevenueByDate;
-import local.kc.springdatajpa.utils.TopSellerBook;
+import local.kc.springdatajpa.utils.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -51,5 +48,23 @@ public class GenericRepositoryTest {
         Pageable pageable = PageRequest.of(0, 5, sort);
         List<CustomerStatistical> customerStatistical = genericRepository.getCustomerStatistical(pageable);
         customerStatistical.forEach(System.out::println);
+    }
+
+    @Test
+    void getRevenueByMonth() {
+        List<RevenueByDate> revenueByMonth = genericRepository.getRevenueByMonth(4, 2024);
+        System.out.println(revenueByMonth);
+    }
+
+    @Test
+    void getRevenueByYear() {
+        List<RevenueByMonth> revenueByYear = genericRepository.getRevenueByYear(2024);
+        System.out.println(revenueByYear);
+    }
+
+    @Test
+    void getRevenueAllTime() {
+        List<RevenueByYear> revenueAllTime = genericRepository.getRevenueAllTime();
+        System.out.println(revenueAllTime);
     }
 }
