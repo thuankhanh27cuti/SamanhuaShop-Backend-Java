@@ -5,6 +5,7 @@ import local.kc.springdatajpa.services.AuthenticationService;
 import local.kc.springdatajpa.utils.authentication.AuthenticationRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -25,6 +26,18 @@ public class AuthenticationController {
     @PostMapping("/authenticate")
     public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequest request) {
         return authenticationService.authenticate(request);
+    }
+
+    @PostMapping("/refresh-token")
+    @PreAuthorize(value = "isAuthenticated()")
+    public ResponseEntity<?> refreshToken(@RequestHeader(value = "Authorization") String authorization) {
+        return authenticationService.refreshToken(authorization);
+    }
+
+    @PostMapping("/is-token-valid")
+    @PreAuthorize(value = "isAuthenticated()")
+    public ResponseEntity<?> isTokenValid(@RequestHeader(value = "Authorization") String authorization) {
+        return authenticationService.isTokenValid(authorization);
     }
 
     @GetMapping("/get-order")

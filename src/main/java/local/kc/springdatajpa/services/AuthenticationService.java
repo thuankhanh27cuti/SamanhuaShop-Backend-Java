@@ -9,6 +9,7 @@ import local.kc.springdatajpa.dtos.CustomerDTO;
 import local.kc.springdatajpa.repositories.CustomerRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -91,5 +92,35 @@ public class AuthenticationService {
                         .collect(Collectors.toSet()))
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    public ResponseEntity<?> refreshToken(String authorization) {
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String jwt = authorization.substring(7);
+        String username = jwtService.extractUsername(jwt);
+        return customerRepository.findCustomerByUsername(username)
+                .filter(customer -> !jwtService.isTokenExpired(jwt))
+                .map(customer -> jwtService.isTokenValid(jwt, customer) ?
+                    ResponseEntity.ok(jwtService.generateToken(customer)) :
+                    ResponseEntity.status(HttpStatus.FORBIDDEN).build())
+                .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+    }
+
+    public ResponseEntity<?> isTokenValid(String authorization) {
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String jwt = authorization.substring(7);
+        String username = jwtService.extractUsername(jwt);
+        return customerRepository.findCustomerByUsername(username)
+                .filter(customer -> !jwtService.isTokenExpired(jwt))
+                .map(customer -> jwtService.isTokenValid(jwt, customer) ?
+                        ResponseEntity.ok().build() :
+                        ResponseEntity.status(HttpStatus.FORBIDDEN).build())
+                .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
     }
 }
