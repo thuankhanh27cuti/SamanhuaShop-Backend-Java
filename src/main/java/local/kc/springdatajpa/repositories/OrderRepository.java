@@ -21,6 +21,9 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     @Query("SELECT new Order (o.id, o.consigneeName, o.address, o.phone, o.createAt, o.finishedAt, o.orderStatus) FROM Order o WHERE o.customer.id = ?1 AND o.orderStatus = ?2")
     List<Order> findByCustomerIdLazyAndStatus(int customerId, OrderStatus status, Pageable pageable);
 
+    @Query("SELECT new Order (o.id, o.consigneeName, o.address, o.phone, o.createAt, o.finishedAt, o.orderStatus) FROM Order o WHERE o.customer.username = ?1")
+    List<Order> findByUsernameLazy(String username, Pageable pageable);
+
     @Query("SELECT o FROM Order o JOIN FETCH o.customer c WHERE o.orderStatus = ?1")
     List<Order> findByOrderStatusLazy(OrderStatus orderStatus, Pageable pageable);
 

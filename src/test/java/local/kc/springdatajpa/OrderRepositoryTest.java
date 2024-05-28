@@ -32,6 +32,13 @@ public class OrderRepositoryTest {
     }
 
     @Test
+    void findByUsernameLazy() {
+        Pageable pageable = PageRequest.of(0, 10);
+        List<Order> orders = orderRepository.findByUsernameLazy("owner", pageable);
+        orders.forEach(System.out::println);
+    }
+
+    @Test
     void countByCustomerId() {
         long l = orderRepository.countByCustomerId(2);
         System.out.println(l);

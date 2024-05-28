@@ -4,6 +4,7 @@ import local.kc.springdatajpa.dtos.CustomerDTO;
 import local.kc.springdatajpa.services.AuthenticationService;
 import local.kc.springdatajpa.utils.authentication.AuthenticationRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -41,8 +42,8 @@ public class AuthenticationController {
     }
 
     @GetMapping("/get-order")
-    public ResponseEntity<?> getOrderByUser(@RequestHeader(value = "Authorization") String authorization) {
-        return authenticationService.getOrderByUser(authorization);
+    public ResponseEntity<?> getOrderByUser(@RequestHeader(value = "Authorization") String authorization, Pageable pageable) {
+        return authenticationService.getOrderByUser(authorization, pageable);
     }
 
     @GetMapping("/get-user")

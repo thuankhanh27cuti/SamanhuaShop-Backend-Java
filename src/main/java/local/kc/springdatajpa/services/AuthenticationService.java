@@ -2,6 +2,8 @@ package local.kc.springdatajpa.services;
 
 import local.kc.springdatajpa.dtos.OrderDTO;
 import local.kc.springdatajpa.models.*;
+import local.kc.springdatajpa.repositories.OrderDetailRepository;
+import local.kc.springdatajpa.repositories.OrderRepository;
 import local.kc.springdatajpa.utils.authentication.AuthenticationRequest;
 import local.kc.springdatajpa.utils.authentication.AuthenticationResponse;
 import local.kc.springdatajpa.config.security.JwtService;
@@ -9,6 +11,7 @@ import local.kc.springdatajpa.dtos.CustomerDTO;
 import local.kc.springdatajpa.repositories.CustomerRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,26 +19,31 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static local.kc.springdatajpa.services.OrderService.orderDetailConsumer;
 
 @Service
 public class AuthenticationService {
     private final CustomerRepository customerRepository;
+    private final OrderRepository orderRepository;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final OrderDetailRepository orderDetailRepository;
 
     @Autowired
-    public AuthenticationService(CustomerRepository customerRepository, PasswordEncoder passwordEncoder,
-                                 ModelMapper modelMapper, JwtService jwtService, AuthenticationManager authenticationManager) {
+    public AuthenticationService(CustomerRepository customerRepository, OrderRepository orderRepository, PasswordEncoder passwordEncoder,
+                                 ModelMapper modelMapper, JwtService jwtService, AuthenticationManager authenticationManager, OrderDetailRepository orderDetailRepository) {
         this.customerRepository = customerRepository;
+        this.orderRepository = orderRepository;
         this.passwordEncoder = passwordEncoder;
         this.modelMapper = modelMapper;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
+        this.orderDetailRepository = orderDetailRepository;
     }
 
     public ResponseEntity<?> register(CustomerDTO customerDTO) {
@@ -44,7 +52,7 @@ public class AuthenticationService {
         customer.setRole(Role.USER);
         customerRepository.save(customer);
         String jwtToken = jwtService.generateToken(customer);
-        return ResponseEntity.ok(new AuthenticationResponse(jwtToken));
+        return ResponseEntity.ok(this.generateAuthenticationResponse(jwtToken, customer));
     }
 
     public ResponseEntity<?> authenticate(AuthenticationRequest request) {
@@ -56,10 +64,14 @@ public class AuthenticationService {
         );
         Customer customer = customerRepository.findCustomerByUsername(request.getUsername()).orElseThrow();
         String jwtToken = jwtService.generateToken(customer);
-        return ResponseEntity.ok(new AuthenticationResponse(jwtToken));
+        return ResponseEntity.ok(this.generateAuthenticationResponse(jwtToken, customer));
     }
 
     public ResponseEntity<?> getUser(String authorization) {
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         String jwt = authorization.substring(7);
         String username = jwtService.extractUsername(jwt);
         return customerRepository.findCustomerByUsernameLazy(username)
@@ -68,30 +80,24 @@ public class AuthenticationService {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    public ResponseEntity<?> getOrderByUser(String authorization) {
+    public ResponseEntity<?> getOrderByUser(String authorization, Pageable pageable) {
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         String jwt = authorization.substring(7);
         String username = jwtService.extractUsername(jwt);
-        return customerRepository.findEagerByUsername(username)
-                .map(customer -> {
-                    Set<Order> orders = customer.getOrders();
-                    orders.forEach(order -> {
-                        System.out.println(order.getId());
-                        Set<OrderDetail> orderDetails = order.getOrderDetails();
-                        orderDetails.forEach(orderDetail -> {
-                            Option option = orderDetail.getOption();
-                            option.setOrdersDetails(new HashSet<>(Set.of(orderDetail)));
-                            Book book = option.getBook();
-                            book.setOptions(new HashSet<>(Set.of(option)));
-                            book.setImages(new HashSet<>());
-                            book.setCategories(new HashSet<>());
-                        });
-                    });
-                    return orders;
-                })
-                .map(orders -> orders.stream().map(order -> modelMapper.map(order, OrderDTO.class))
-                        .collect(Collectors.toSet()))
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity
+                .ok(orderRepository.findByUsernameLazy(username, pageable).stream()
+                        .peek(order -> {
+                            Set<OrderDetail> orderDetails = orderDetailRepository.findByOrderId(order.getId());
+                            Set<OrderDetail> set = orderDetails.stream()
+                                    .peek(orderDetailConsumer)
+                                    .collect(Collectors.toSet());
+                            order.setOrderDetails(set);
+                        })
+                        .map(order -> modelMapper.map(order, OrderDTO.class))
+                        .toList());
     }
 
     public ResponseEntity<?> refreshToken(String authorization) {
@@ -104,7 +110,7 @@ public class AuthenticationService {
         return customerRepository.findCustomerByUsername(username)
                 .filter(customer -> !jwtService.isTokenExpired(jwt))
                 .map(customer -> jwtService.isTokenValid(jwt, customer) ?
-                    ResponseEntity.ok(jwtService.generateToken(customer)) :
+                    ResponseEntity.ok(this.generateAuthenticationResponse(jwtService.generateToken(customer), customer)) :
                     ResponseEntity.status(HttpStatus.FORBIDDEN).build())
                 .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
     }
@@ -122,5 +128,15 @@ public class AuthenticationService {
                         ResponseEntity.ok().build() :
                         ResponseEntity.status(HttpStatus.FORBIDDEN).build())
                 .orElse(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+    }
+
+    private AuthenticationResponse generateAuthenticationResponse(String jwtToken, Customer customer) {
+        return AuthenticationResponse.builder()
+                .token(jwtToken)
+                .subject(jwtService.extractUsername(jwtToken))
+                .exp(jwtService.extractExpiration(jwtToken))
+                .avatar(customer.getImage())
+                .role(customer.getRole().toString())
+                .build();
     }
 }

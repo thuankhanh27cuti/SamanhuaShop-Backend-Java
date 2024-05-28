@@ -49,7 +49,7 @@ public class OrderDTOSerialization extends JsonSerializer<OrderDTO> {
                         }
                         jsonGenerator.writeStringField("name", optionDTO.getName());
 
-                        jsonGenerator.writeObjectFieldStart("books");
+                        jsonGenerator.writeObjectFieldStart("book");
                         BookDTO book = optionDTO.getBook();
                         if (book != null) {
                             if (book.getId() != null) {
