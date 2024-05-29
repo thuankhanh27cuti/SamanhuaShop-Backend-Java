@@ -2,7 +2,6 @@ package local.kc.springdatajpa.services;
 
 import local.kc.springdatajpa.dtos.OrderDTO;
 import local.kc.springdatajpa.models.*;
-import local.kc.springdatajpa.repositories.CustomerRepository;
 import local.kc.springdatajpa.repositories.OrderDetailRepository;
 import local.kc.springdatajpa.repositories.OrderRepository;
 import org.modelmapper.ModelMapper;
@@ -21,17 +20,14 @@ import java.util.stream.Collectors;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final ModelMapper modelMapper;
-    private final CustomerRepository customerRepository;
     private final OrderDetailRepository orderDetailRepository;
 
     @Autowired
     public OrderService(OrderRepository orderRepository,
                         ModelMapper modelMapper,
-                        CustomerRepository customerRepository,
                         OrderDetailRepository orderDetailRepository) {
         this.orderRepository = orderRepository;
         this.modelMapper = modelMapper;
-        this.customerRepository = customerRepository;
         this.orderDetailRepository = orderDetailRepository;
     }
 
@@ -88,22 +84,21 @@ public class OrderService {
     }
 
     public ResponseEntity<?> saveOrder(OrderDTO orderDTO) {
-        Integer customerId = orderDTO.getCustomer().getId();
-        Customer customer = customerRepository.findById(customerId).orElse(null);
-        if (customer == null) {
-            return ResponseEntity.noContent().build();
-        }
-
-        Order order = orderRepository.save(Order.builder()
-                .customer(customer)
-                .consigneeName(orderDTO.getConsigneeName())
-                .address(orderDTO.getAddress())
-                .phone(orderDTO.getPhone())
-                .createAt(new Date())
-                .orderStatus(OrderStatus.PENDING)
-                .orderDetails(new HashSet<>())
-                .build());
-        return ResponseEntity.ok(order.getId());
+        Order order = modelMapper.map(orderDTO, Order.class);
+        order.setCreateAt(new Date());
+        Integer orderId = orderRepository.save(order).getId();
+        order.getOrderDetails().forEach(orderDetail -> {
+            Integer optionId = orderDetail.getOrderDetailId().getOptionId();
+            OrderDetail orderDetail1 = OrderDetail.builder()
+                    .orderDetailId(new OrderDetailId(orderId, optionId))
+                    .order(new Order(orderId))
+                    .option(new Option(optionId))
+                    .price(orderDetail.getPrice())
+                    .quantity(orderDetail.getQuantity())
+                    .build();
+            orderDetailRepository.save(orderDetail1);
+        });
+        return ResponseEntity.ok().build();
     }
 
     public ResponseEntity<?> findById(int id) {
