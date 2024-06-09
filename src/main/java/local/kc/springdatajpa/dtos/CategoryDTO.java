@@ -15,4 +15,8 @@ public class CategoryDTO implements Serializable {
     String name;
     String image;
     Set<BookDTO> books;
+
+    public CategoryDTO(Integer id) {
+        this.id = id;
+    }
 }

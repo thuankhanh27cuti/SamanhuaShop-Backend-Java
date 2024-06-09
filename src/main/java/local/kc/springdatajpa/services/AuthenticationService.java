@@ -4,6 +4,8 @@ import local.kc.springdatajpa.dtos.OrderDTO;
 import local.kc.springdatajpa.models.*;
 import local.kc.springdatajpa.repositories.OrderDetailRepository;
 import local.kc.springdatajpa.repositories.OrderRepository;
+import local.kc.springdatajpa.utils.ChangePasswordRequest;
+import local.kc.springdatajpa.utils.ErrorRes;
 import local.kc.springdatajpa.utils.authentication.AuthenticationRequest;
 import local.kc.springdatajpa.utils.authentication.AuthenticationResponse;
 import local.kc.springdatajpa.config.security.JwtService;
@@ -62,9 +64,34 @@ public class AuthenticationService {
                         request.getPassword()
                 )
         );
-        Customer customer = customerRepository.findCustomerByUsername(request.getUsername()).orElseThrow();
+        Customer customer = customerRepository.findCustomerByUsername(request.getUsername()).orElse(null);
+        if (customer == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         String jwtToken = jwtService.generateToken(customer);
         return ResponseEntity.ok(this.generateAuthenticationResponse(jwtToken, customer));
+    }
+
+    public ResponseEntity<?> changePassword(String authorization, ChangePasswordRequest request) {
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String jwt = authorization.substring(7);
+        String username = jwtService.extractUsername(jwt);
+        Customer customer = customerRepository.findCustomerByUsername(username).orElse(null);
+        if (customer == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorRes.builder().msg("Can't find customer with username " + username).build());
+        }
+
+        if (passwordEncoder.matches(request.getOldPassword(), customer.getPassword())) {
+            customer.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            customerRepository.save(customer);
+            return ResponseEntity.ok().build();
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorRes.builder().msg("Wrong password").build());
+        }
     }
 
     public ResponseEntity<?> getUser(String authorization) {

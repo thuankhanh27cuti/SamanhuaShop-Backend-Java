@@ -2,6 +2,7 @@ package local.kc.springdatajpa.services;
 
 import local.kc.springdatajpa.dtos.BookDTO;
 import local.kc.springdatajpa.models.Book;
+import local.kc.springdatajpa.models.Category;
 import local.kc.springdatajpa.repositories.BookRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -70,5 +72,23 @@ public class BookService {
     public ResponseEntity<?> countByCategoryId(int id) {
         long count = bookRepository.countByCategoryId(id);
         return ResponseEntity.ok(count);
+    }
+
+    public ResponseEntity<?> editBook(int id, BookDTO bookDTO) {
+        Book book = bookRepository.findById(id).orElse(null);
+        if (book == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        book.setName(bookDTO.getName());
+        book.setDescription(bookDTO.getDescription());
+        book.setPrice(bookDTO.getPrice());
+
+        Book mapped = modelMapper.map(bookDTO, Book.class);
+        Set<Category> categories = mapped.getCategories();
+        book.setCategories(categories);
+
+        bookRepository.save(book);
+        return ResponseEntity.ok().build();
     }
 }

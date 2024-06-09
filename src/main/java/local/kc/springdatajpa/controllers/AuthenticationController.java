@@ -2,6 +2,7 @@ package local.kc.springdatajpa.controllers;
 
 import local.kc.springdatajpa.dtos.CustomerDTO;
 import local.kc.springdatajpa.services.AuthenticationService;
+import local.kc.springdatajpa.utils.ChangePasswordRequest;
 import local.kc.springdatajpa.utils.authentication.AuthenticationRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +28,11 @@ public class AuthenticationController {
     @PostMapping("/authenticate")
     public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequest request) {
         return authenticationService.authenticate(request);
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestHeader(value = "Authorization") String authorization, @RequestBody ChangePasswordRequest request) {
+        return authenticationService.changePassword(authorization, request);
     }
 
     @PostMapping("/refresh-token")

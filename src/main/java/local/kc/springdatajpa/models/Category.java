@@ -23,11 +23,15 @@ public class Category {
     @Column(name = "category_image", nullable = false)
     private String image;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "books_categories",
             joinColumns = @JoinColumn(name = "category_id"),
             inverseJoinColumns = @JoinColumn(name = "book_id"))
     private Set<Book> books;
+
+    public Category(Integer id) {
+        this.id = id;
+    }
 
     public Category(Integer id, String name, String image) {
         this.id = id;

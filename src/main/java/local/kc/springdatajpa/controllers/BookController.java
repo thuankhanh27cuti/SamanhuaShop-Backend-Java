@@ -1,13 +1,11 @@
 package local.kc.springdatajpa.controllers;
 
+import local.kc.springdatajpa.dtos.BookDTO;
 import local.kc.springdatajpa.services.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/books")
@@ -47,5 +45,10 @@ public class BookController {
     @GetMapping("/count/by-category/{id}")
     public ResponseEntity<?> countByCategoryId(@PathVariable(name = "id") int categoryId) {
         return bookService.countByCategoryId(categoryId);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> editBook(@PathVariable(name = "id") int id, @RequestBody BookDTO bookDTO) {
+        return bookService.editBook(id, bookDTO);
     }
 }
