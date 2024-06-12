@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -72,6 +73,13 @@ public class BookService {
     public ResponseEntity<?> countByCategoryId(int id) {
         long count = bookRepository.countByCategoryId(id);
         return ResponseEntity.ok(count);
+    }
+
+    public ResponseEntity<?> saveBook(BookDTO bookDTO) {
+        Book mapped = modelMapper.map(bookDTO, Book.class);
+        mapped.setCreateAt(new Date());
+        mapped.setImage("/img/quy-thuan-khanh.jpg");
+        return ResponseEntity.ok(modelMapper.map(bookRepository.save(mapped), BookDTO.class));
     }
 
     public ResponseEntity<?> editBook(int id, BookDTO bookDTO) {

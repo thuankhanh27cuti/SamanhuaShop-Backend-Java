@@ -47,6 +47,11 @@ public class BookController {
         return bookService.countByCategoryId(categoryId);
     }
 
+    @PostMapping
+    public ResponseEntity<?> saveBook(@RequestBody BookDTO bookDTO) {
+        return bookService.saveBook(bookDTO);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<?> editBook(@PathVariable(name = "id") int id, @RequestBody BookDTO bookDTO) {
         return bookService.editBook(id, bookDTO);
