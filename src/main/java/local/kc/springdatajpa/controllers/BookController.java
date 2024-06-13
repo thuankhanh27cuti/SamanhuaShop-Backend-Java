@@ -56,4 +56,9 @@ public class BookController {
     public ResponseEntity<?> editBook(@PathVariable(name = "id") int id, @RequestBody BookDTO bookDTO) {
         return bookService.editBook(id, bookDTO);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteBook(@PathVariable(name = "id") int id) {
+        return bookService.deleteBook(id);
+    }
 }

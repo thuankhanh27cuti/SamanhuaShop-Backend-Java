@@ -109,4 +109,9 @@ public class BookService {
         bookRepository.save(book);
         return ResponseEntity.ok().build();
     }
+
+    public ResponseEntity<?> deleteBook(int id) {
+        bookRepository.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
 }
