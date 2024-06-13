@@ -55,6 +55,10 @@ public class Book {
         this.createAt = createAt;
     }
 
+    public Book(Integer id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return "Book{" +

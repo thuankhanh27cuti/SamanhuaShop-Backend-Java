@@ -20,7 +20,9 @@ public class BookDTOSerialization extends JsonSerializer<BookDTO> {
         }
         jsonGenerator.writeStringField("name", bookDTO.getName());
         jsonGenerator.writeStringField("image", bookDTO.getImage());
-        jsonGenerator.writeNumberField("price", bookDTO.getPrice());
+        if (bookDTO.getPrice() != null) {
+            jsonGenerator.writeNumberField("price", bookDTO.getPrice());
+        }
         jsonGenerator.writeStringField("description", bookDTO.getDescription());
         jsonGenerator.writeStringField("createAt", bookDTO.getCreateAt() != null ? bookDTO.getCreateAt().toString(): null);
 
@@ -54,7 +56,9 @@ public class BookDTOSerialization extends JsonSerializer<BookDTO> {
                     }
                     jsonGenerator.writeStringField("name", optionDTO.getName());
                     jsonGenerator.writeStringField("image", optionDTO.getImage());
-                    jsonGenerator.writeNumberField("quantity", optionDTO.getQuantity());
+                    if (optionDTO.getQuantity() != null) {
+                        jsonGenerator.writeNumberField("quantity", optionDTO.getQuantity());
+                    }
                     jsonGenerator.writeEndObject();
                 } catch (IOException e) {
                     throw new RuntimeException(e);

@@ -4,6 +4,7 @@ import local.kc.springdatajpa.dtos.BookDTO;
 import local.kc.springdatajpa.models.Book;
 import local.kc.springdatajpa.models.Category;
 import local.kc.springdatajpa.repositories.BookRepository;
+import local.kc.springdatajpa.repositories.ImageRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -19,11 +20,13 @@ import java.util.stream.Collectors;
 @Service
 public class BookService {
     private final BookRepository bookRepository;
+    private final ImageRepository imageRepository;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public BookService(BookRepository bookRepository, ModelMapper modelMapper) {
+    public BookService(BookRepository bookRepository, ImageRepository imageRepository, ModelMapper modelMapper) {
         this.bookRepository = bookRepository;
+        this.imageRepository = imageRepository;
         this.modelMapper = modelMapper;
     }
 
@@ -76,10 +79,17 @@ public class BookService {
     }
 
     public ResponseEntity<?> saveBook(BookDTO bookDTO) {
-        Book mapped = modelMapper.map(bookDTO, Book.class);
-        mapped.setCreateAt(new Date());
-        mapped.setImage("/img/quy-thuan-khanh.jpg");
-        return ResponseEntity.ok(modelMapper.map(bookRepository.save(mapped), BookDTO.class));
+        Book b = modelMapper.map(bookDTO, Book.class);
+        b.setCreateAt(new Date());
+
+        Book book = bookRepository.save(b);
+
+        b.getImages().forEach(image -> {
+            image.setBook(new Book(book.getId()));
+            imageRepository.save(image);
+        });
+
+        return ResponseEntity.ok(modelMapper.map(new Book(book.getId()), BookDTO.class));
     }
 
     public ResponseEntity<?> editBook(int id, BookDTO bookDTO) {

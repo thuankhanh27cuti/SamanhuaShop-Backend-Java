@@ -39,7 +39,7 @@ public class Base64Service {
                 return ResponseEntity.internalServerError().build();
             }
 
-            return ResponseEntity.ok(new Base64Response(fileName));
+            return ResponseEntity.ok(new Base64Response("/images/" + fileName));
         }
         return ResponseEntity.badRequest().build();
     }
