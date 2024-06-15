@@ -99,6 +99,7 @@ public class BookService {
         }
 
         book.setName(bookDTO.getName());
+        book.setImage(bookDTO.getImage());
         book.setDescription(bookDTO.getDescription());
         book.setPrice(bookDTO.getPrice());
 

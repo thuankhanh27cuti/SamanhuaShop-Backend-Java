@@ -22,6 +22,11 @@ public class Image {
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
+    public Image(Integer id, String src) {
+        this.id = id;
+        this.src = src;
+    }
+
     @Override
     public String toString() {
         return "Image{" +
