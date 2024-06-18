@@ -24,4 +24,8 @@ public class BookDTO implements Serializable {
     Set<CategoryDTO> categories;
     Set<OptionDTO> options;
     Set<ImageDTO> images;
+
+    public BookDTO(Integer id) {
+        this.id = id;
+    }
 }

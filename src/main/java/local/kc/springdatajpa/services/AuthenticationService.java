@@ -101,10 +101,8 @@ public class AuthenticationService {
 
         String jwt = authorization.substring(7);
         String username = jwtService.extractUsername(jwt);
-        return customerRepository.findCustomerByUsernameLazy(username)
-                .map(customer -> modelMapper.map(customer, CustomerDTO.class))
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.of(customerRepository.findCustomerByUsernameLazy(username)
+                .map(customer -> modelMapper.map(customer, CustomerDTO.class)));
     }
 
     public ResponseEntity<?> getOrderByUser(String authorization, Pageable pageable) {

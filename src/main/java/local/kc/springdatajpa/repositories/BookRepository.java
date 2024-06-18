@@ -25,4 +25,10 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
 
     @Query("SELECT COUNT(b) FROM Book b INNER JOIN b.categories c WHERE c.id = ?1")
     long countByCategoryId(int id);
+
+    @Query("select b from Book b where upper(b.name) like upper(?1)")
+    List<Book> findByNameLikeIgnoreCase(String name);
+
+    @Query("select b from Book b where upper(b.name) like upper(concat(?1, '%'))")
+    List<Book> findByNameStartsWithIgnoreCase(String name);
 }

@@ -102,7 +102,7 @@ public class OrderService {
     }
 
     public ResponseEntity<?> findById(int id) {
-        return orderRepository.findByIdLazy(id)
+        return ResponseEntity.of(orderRepository.findByIdLazy(id)
                 .map(order -> {
                     Customer customer = order.getCustomer();
                     customer.setOrders(new HashSet<>());
@@ -110,9 +110,7 @@ public class OrderService {
                     orderDetails.forEach(orderDetailConsumer);
                     return order;
                 })
-                .map(order -> modelMapper.map(order, OrderDTO.class))
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(order -> modelMapper.map(order, OrderDTO.class)));
     }
 
     public static final Consumer<OrderDetail> orderDetailConsumer = orderDetail -> {

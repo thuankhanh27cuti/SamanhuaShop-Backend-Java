@@ -39,10 +39,8 @@ public class BookService {
     }
 
     public ResponseEntity<?> findById(int id) {
-        return bookRepository.findByIdLazy(id)
-                .map(book -> modelMapper.map(book, BookDTO.class))
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.of(bookRepository.findByIdLazy(id)
+                .map(book -> modelMapper.map(book, BookDTO.class)));
     }
 
     public ResponseEntity<?> findByCategoryId(int categoryId, Pageable pageable) {
@@ -55,7 +53,7 @@ public class BookService {
 
 
     public ResponseEntity<?> findByOptionId(int optionId) {
-        return bookRepository.findByOptionId(optionId)
+        return ResponseEntity.of(bookRepository.findByOptionId(optionId)
                 .map(book -> {
                             book.setCategories(new HashSet<>());
                             book.setImages(new HashSet<>());
@@ -63,9 +61,7 @@ public class BookService {
                             return book;
                         }
                 )
-                .map(book -> modelMapper.map(book, BookDTO.class))
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(book -> modelMapper.map(book, BookDTO.class)));
     }
 
     public ResponseEntity<?> count() {
@@ -114,5 +110,10 @@ public class BookService {
     public ResponseEntity<?> deleteBook(int id) {
         bookRepository.deleteById(id);
         return ResponseEntity.ok().build();
+    }
+
+    public ResponseEntity<?> findByName(String name) {
+        List<Book> books = bookRepository.findByNameLikeIgnoreCase(name);
+        return ResponseEntity.ok(books);
     }
 }

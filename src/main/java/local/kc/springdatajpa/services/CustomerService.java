@@ -22,10 +22,8 @@ public class CustomerService {
     }
 
     public ResponseEntity<?> findById(int id) {
-        return customerRepository.findEagerById(id)
-                .map(customer -> modelMapper.map(customer, CustomerDTO.class))
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.noContent().build());
+        return ResponseEntity.of(customerRepository.findEagerById(id)
+                .map(customer -> modelMapper.map(customer, CustomerDTO.class)));
     }
 
     public ResponseEntity<?> findAll(Pageable pageable) {

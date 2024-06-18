@@ -27,10 +27,8 @@ public class CategoryService {
     }
 
     public ResponseEntity<?> findById(int id) {
-        return categoryRepository.findByIdLazy(id)
-                .map(category -> modelMapper.map(category, CategoryDTO.class))
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.noContent().build());
+        return ResponseEntity.of(categoryRepository.findByIdLazy(id)
+                .map(category -> modelMapper.map(category, CategoryDTO.class)));
     }
 
     public ResponseEntity<?> findByBookId(int id) {
