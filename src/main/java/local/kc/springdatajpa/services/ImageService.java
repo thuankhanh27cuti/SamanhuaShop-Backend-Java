@@ -1,5 +1,8 @@
 package local.kc.springdatajpa.services;
 
+import local.kc.springdatajpa.dtos.ImageDTO;
+import local.kc.springdatajpa.models.Book;
+import local.kc.springdatajpa.models.Image;
 import local.kc.springdatajpa.repositories.ImageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,5 +19,19 @@ public class ImageService {
 
     public ResponseEntity<?> getImagesByBookId(int id) {
         return ResponseEntity.ok(imageRepository.findByBookId(id));
+    }
+
+    public ResponseEntity<?> addImage(ImageDTO imageDTO) {
+        Image image = Image.builder()
+                .src(imageDTO.getSrc())
+                .book(new Book(imageDTO.getBook().getId()))
+                .build();
+        imageRepository.save(image);
+        return ResponseEntity.ok().build();
+    }
+
+    public ResponseEntity<?> deleteImage(int id) {
+        imageRepository.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 }

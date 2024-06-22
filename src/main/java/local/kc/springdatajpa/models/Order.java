@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -60,17 +59,6 @@ public class Order {
         this.id = id;
     }
 
-    public void addOrderDetail(OrderDetail orderDetail) {
-        if (this.orderDetails == null) {
-            this.orderDetails = new HashSet<>();
-        }
-        this.orderDetails.add(orderDetail);
-    }
-
-    public void removeOrderDetail(OrderDetail orderDetail) {
-        this.orderDetails.remove(orderDetail);
-    }
-
     @Override
     public String toString() {
         return "Order{" +
@@ -79,6 +67,7 @@ public class Order {
                 ", address='" + address + '\'' +
                 ", phone='" + phone + '\'' +
                 ", createAt=" + createAt +
+                ", finishedAt=" + finishedAt +
                 ", orderStatus=" + orderStatus +
                 '}';
     }

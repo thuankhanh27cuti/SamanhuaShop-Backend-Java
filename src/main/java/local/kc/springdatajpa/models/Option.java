@@ -55,11 +55,4 @@ public class Option {
                 ", image='" + image + '\'' +
                 '}';
     }
-
-    public void addOrderDetail(OrderDetail orderDetail) {
-        if (ordersDetails == null) {
-            ordersDetails = new HashSet<>();
-        }
-        ordersDetails.add(orderDetail);
-    }
 }

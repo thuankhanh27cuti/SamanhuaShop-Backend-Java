@@ -15,6 +15,9 @@ public interface CustomerRepository extends JpaRepository<Customer, Integer> {
     @Query("SELECT new Customer(c.id, c.name, c.gender, c.image, c.phone, c.username, c.role) FROM Customer c")
     List<Customer> findAllLazy(Pageable pageable);
 
+    @Query("SELECT new Customer(c.id, c.name, c.gender, c.image, c.phone, c.username, c.role) FROM Customer c WHERE c.id = ?1")
+    Optional<Customer> findLazyById(Integer id);
+
     @Query("SELECT c FROM Customer c LEFT JOIN FETCH c.orders o LEFT JOIN FETCH o.orderDetails od WHERE c.id = ?1")
     Optional<Customer> findEagerById(Integer id);
 

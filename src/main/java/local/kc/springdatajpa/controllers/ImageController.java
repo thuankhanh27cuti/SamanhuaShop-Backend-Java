@@ -1,15 +1,10 @@
 package local.kc.springdatajpa.controllers;
 
-import local.kc.springdatajpa.models.Image;
+import local.kc.springdatajpa.dtos.ImageDTO;
 import local.kc.springdatajpa.services.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/images")
@@ -24,5 +19,15 @@ public class ImageController {
     @GetMapping("/by-book/{id}")
     public ResponseEntity<?> getImagesByBookId(@PathVariable(name = "id") int id) {
         return imageService.getImagesByBookId(id);
+    }
+
+    @PostMapping()
+    public ResponseEntity<?> addImage(@RequestBody ImageDTO imageDTO) {
+        return imageService.addImage(imageDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteImage(@PathVariable(name = "id") int id) {
+        return imageService.deleteImage(id);
     }
 }

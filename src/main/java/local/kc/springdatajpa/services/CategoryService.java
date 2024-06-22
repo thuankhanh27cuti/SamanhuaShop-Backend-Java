@@ -1,6 +1,7 @@
 package local.kc.springdatajpa.services;
 
 import local.kc.springdatajpa.dtos.CategoryDTO;
+import local.kc.springdatajpa.models.Category;
 import local.kc.springdatajpa.repositories.CategoryRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,5 +41,30 @@ public class CategoryService {
     public ResponseEntity<?> count() {
         long count = categoryRepository.count();
         return ResponseEntity.ok(count);
+    }
+
+    public ResponseEntity<?> saveCategory(CategoryDTO categoryDTO) {
+        Category category = Category.builder()
+                .name(categoryDTO.getName())
+                .image(categoryDTO.getImage())
+                .build();
+        categoryRepository.save(category);
+        return ResponseEntity.ok().build();
+    }
+
+    public ResponseEntity<?> updateCategory(int id, CategoryDTO categoryDTO) {
+        Category category = categoryRepository.findById(id).orElse(null);
+        if (category == null) {
+            return ResponseEntity.notFound().build();
+        }
+        category.setName(categoryDTO.getName());
+        category.setImage(categoryDTO.getImage());
+        categoryRepository.save(category);
+        return ResponseEntity.ok().build();
+    }
+
+    public ResponseEntity<?> deleteCategory(int id) {
+        categoryRepository.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 }

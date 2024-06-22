@@ -1,13 +1,12 @@
 package local.kc.springdatajpa.controllers;
 
+import local.kc.springdatajpa.dtos.CategoryDTO;
+import local.kc.springdatajpa.models.Category;
 import local.kc.springdatajpa.services.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/categories")
@@ -37,5 +36,20 @@ public class CategoryController {
     @GetMapping("/count")
     public ResponseEntity<?> count() {
         return categoryService.count();
+    }
+
+    @PostMapping
+    public ResponseEntity<?> saveCategory(@RequestBody CategoryDTO categoryDTO) {
+        return categoryService.saveCategory(categoryDTO);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateCategory(@PathVariable(name = "id") int id, @RequestBody CategoryDTO categoryDTO) {
+        return categoryService.updateCategory(id, categoryDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteCategory(@PathVariable(name = "id") int id) {
+        return categoryService.deleteCategory(id);
     }
 }

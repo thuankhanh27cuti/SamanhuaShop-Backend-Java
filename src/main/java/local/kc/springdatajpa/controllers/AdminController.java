@@ -43,7 +43,6 @@ public class AdminController {
 
     @GetMapping("/revenue-by-date")
     public ResponseEntity<?> getRevenueByDate(@RequestParam(name = "date") LocalDate date) {
-        System.out.println(date);
         return adminService.getRevenueByDate(date);
     }
 

@@ -101,11 +101,4 @@ public class Customer implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
-    public void addOrder(Order order) {
-        if (orders == null) {
-            orders = new HashSet<>();
-        }
-        orders.add(order);
-    }
 }

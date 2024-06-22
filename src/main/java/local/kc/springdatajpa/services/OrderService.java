@@ -140,4 +140,30 @@ public class OrderService {
     public ResponseEntity<?> countByCustomerIdAndStatusStatus(int id, OrderStatus status) {
         return ResponseEntity.ok(orderRepository.countByCustomerIdAndStatus(id, status));
     }
+
+    public ResponseEntity<?> updateOrder(int id, OrderDTO orderDTO) {
+        Order order = orderRepository.findById(id).orElse(null);
+        if (order == null) {
+            return ResponseEntity.ok().build();
+        }
+
+        order.setConsigneeName(orderDTO.getConsigneeName());
+        order.setPhone(orderDTO.getPhone());
+        order.setAddress(orderDTO.getAddress());
+        order.setOrderStatus(orderDTO.getOrderStatus());
+
+        orderRepository.save(order);
+        return ResponseEntity.ok().build();
+    }
+
+    public ResponseEntity<?> updateOrderStatus(int id, OrderStatus status) {
+        Order order = orderRepository.findById(id).orElse(null);
+        if (order == null) {
+            return ResponseEntity.ok().build();
+        }
+        order.setOrderStatus(status);
+
+        orderRepository.save(order);
+        return ResponseEntity.ok().build();
+    }
 }

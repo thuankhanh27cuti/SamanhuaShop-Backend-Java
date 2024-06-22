@@ -74,4 +74,14 @@ public class OrderController {
     public ResponseEntity<?> saveOrder(@RequestBody OrderDTO orderDTO) {
         return orderService.saveOrder(orderDTO);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateOrder(@PathVariable(name = "id") int id, @RequestBody OrderDTO orderDTO) {
+        return orderService.updateOrder(id, orderDTO);
+    }
+
+    @PutMapping("/by-status/{id}")
+    public ResponseEntity<?> updateOrderStatus(@PathVariable(name = "id") int id, @RequestParam(name = "status") OrderStatus status) {
+        return orderService.updateOrderStatus(id, status);
+    }
 }
