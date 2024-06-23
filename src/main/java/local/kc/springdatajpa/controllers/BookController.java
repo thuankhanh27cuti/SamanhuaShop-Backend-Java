@@ -58,8 +58,8 @@ public class BookController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> editBook(@PathVariable(name = "id") int id, @RequestBody BookDTO bookDTO) {
-        return bookService.editBook(id, bookDTO);
+    public ResponseEntity<?> updateBook(@PathVariable(name = "id") int id, @RequestBody BookDTO bookDTO) {
+        return bookService.updateBook(id, bookDTO);
     }
 
     @DeleteMapping("/{id}")

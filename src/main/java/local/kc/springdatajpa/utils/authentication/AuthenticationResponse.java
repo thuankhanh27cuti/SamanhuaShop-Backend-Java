@@ -13,6 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthenticationResponse {
+    private int id;
     private String token;
     private String subject;
     private Date exp;

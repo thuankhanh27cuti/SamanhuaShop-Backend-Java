@@ -88,7 +88,7 @@ public class BookService {
         return ResponseEntity.ok(modelMapper.map(new Book(book.getId()), BookDTO.class));
     }
 
-    public ResponseEntity<?> editBook(int id, BookDTO bookDTO) {
+    public ResponseEntity<?> updateBook(int id, BookDTO bookDTO) {
         Book book = bookRepository.findById(id).orElse(null);
         if (book == null) {
             return ResponseEntity.notFound().build();

@@ -6,8 +6,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -30,6 +30,9 @@ public class Customer implements UserDetails {
     @Column(name = "customer_gender", nullable = false)
     private String gender;
 
+    @Column(name = "customer_dob")
+    private LocalDate birthday;
+
     @Column(name = "customer_image")
     private String image;
 
@@ -46,8 +49,14 @@ public class Customer implements UserDetails {
     private Set<Order> orders;
 
     @Column(name = "customer_role", nullable = false)
-    @Enumerated(EnumType.STRING)
     private Role role;
+
+    @Column(name = "customer_is_deleted", nullable = false, columnDefinition = "boolean default false")
+    private boolean isDeleted;
+
+    @ManyToOne
+    @JoinColumn(name = "ward_id")
+    private Ward ward;
 
     public Customer(Integer id, String name, String gender, String image, String phone, String username, Role role) {
         this.id = id;
@@ -57,10 +66,6 @@ public class Customer implements UserDetails {
         this.phone = phone;
         this.username = username;
         this.role = role;
-    }
-
-    public Customer(Integer id) {
-        this.id = id;
     }
 
     @Override

@@ -34,6 +34,9 @@ public class Book {
     @Column(name = "book_created_at", nullable = false)
     private Date createAt;
 
+    @Column(name = "book_is_deleted", nullable = false, columnDefinition = "boolean default false")
+    private boolean isDeleted;
+
     @ManyToMany()
     @JoinTable(name = "books_categories",
             joinColumns = @JoinColumn(name = "book_id"),
@@ -46,6 +49,10 @@ public class Book {
     @OneToMany(mappedBy = "book", cascade = CascadeType.REMOVE)
     private Set<Image> images;
 
+    public Book(Integer id) {
+        this.id = id;
+    }
+
     public Book(Integer id, String name, String image, Integer price, String description, Date createAt) {
         this.id = id;
         this.name = name;
@@ -53,10 +60,6 @@ public class Book {
         this.price = price;
         this.description = description;
         this.createAt = createAt;
-    }
-
-    public Book(Integer id) {
-        this.id = id;
     }
 
     @Override

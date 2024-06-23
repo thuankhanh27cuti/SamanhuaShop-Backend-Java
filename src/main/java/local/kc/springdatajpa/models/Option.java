@@ -3,7 +3,6 @@ package local.kc.springdatajpa.models;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -27,6 +26,9 @@ public class Option {
 
     @Column(name = "option_image", nullable = false)
     private String image;
+
+    @Column(name = "option_is_deleted", nullable = false, columnDefinition = "boolean default false")
+    private boolean isDeleted;
 
     @ManyToOne
     @JoinColumn(name = "book_id", nullable = false)

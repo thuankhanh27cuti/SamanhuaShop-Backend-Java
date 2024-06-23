@@ -157,6 +157,7 @@ public class AuthenticationService {
 
     private AuthenticationResponse generateAuthenticationResponse(String jwtToken, Customer customer) {
         return AuthenticationResponse.builder()
+                .id(customer.getId())
                 .token(jwtToken)
                 .subject(jwtService.extractUsername(jwtToken))
                 .exp(jwtService.extractExpiration(jwtToken))
