@@ -2,6 +2,7 @@ package local.kc.springdatajpa.dtos;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import local.kc.springdatajpa.models.OrderStatus;
+import local.kc.springdatajpa.models.PaymentMethod;
 import local.kc.springdatajpa.serializations.OrderDTOSerialization;
 import lombok.*;
 
@@ -25,4 +26,9 @@ public class OrderDTO implements Serializable {
     OrderStatus orderStatus;
     CustomerDTO customer;
     Set<OrderDetailDTO> orderDetails;
+    PaymentMethod paymentMethod;
+    WardDTO ward;
+    DistrictDTO district;
+    ProvinceDTO province;
+    Set<OrderLogDTO> orderLogs;
 }

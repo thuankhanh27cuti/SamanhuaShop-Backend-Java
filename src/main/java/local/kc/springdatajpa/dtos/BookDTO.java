@@ -24,6 +24,7 @@ public class BookDTO implements Serializable {
     Set<CategoryDTO> categories;
     Set<OptionDTO> options;
     Set<ImageDTO> images;
+    boolean isDeleted;
 
     public BookDTO(Integer id) {
         this.id = id;

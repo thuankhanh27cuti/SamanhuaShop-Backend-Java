@@ -29,6 +29,7 @@ public class OrderDTOSerialization extends JsonSerializer<OrderDTO> {
                 jsonGenerator.writeNumberField("id", customer.getId());
             }
             jsonGenerator.writeStringField("username", customer.getUsername());
+            jsonGenerator.writeBooleanField("isDeleted", customer.isDeleted());
             jsonGenerator.writeEndObject();
         }
 
@@ -48,6 +49,7 @@ public class OrderDTOSerialization extends JsonSerializer<OrderDTO> {
                             jsonGenerator.writeNumberField("id", optionDTO.getId());
                         }
                         jsonGenerator.writeStringField("name", optionDTO.getName());
+                        jsonGenerator.writeBooleanField("isDeleted", optionDTO.isDeleted());
 
                         jsonGenerator.writeObjectFieldStart("book");
                         BookDTO book = optionDTO.getBook();
@@ -58,6 +60,7 @@ public class OrderDTOSerialization extends JsonSerializer<OrderDTO> {
                             jsonGenerator.writeStringField("name", book.getName());
                             jsonGenerator.writeStringField("image", book.getImage());
                             jsonGenerator.writeNumberField("price", book.getPrice());
+                            jsonGenerator.writeBooleanField("isDeleted", book.isDeleted());
                         }
                         jsonGenerator.writeEndObject();
                     }
@@ -72,6 +75,59 @@ public class OrderDTOSerialization extends JsonSerializer<OrderDTO> {
 
         }
 
+        jsonGenerator.writeStringField("paymentMethod", orderDTO.getPaymentMethod() != null ? orderDTO.getPaymentMethod().toString(): null);
+
+        WardDTO ward = orderDTO.getWard();
+        if (ward != null) {
+            jsonGenerator.writeObjectFieldStart("ward");
+            if (ward.getCode() != null) {
+                jsonGenerator.writeNumberField("code", ward.getCode());
+            }
+            jsonGenerator.writeStringField("name", ward.getName());
+            jsonGenerator.writeStringField("fullName", ward.getFullName());
+            jsonGenerator.writeEndObject();
+        }
+
+        DistrictDTO district = orderDTO.getDistrict();
+        if (district != null) {
+            jsonGenerator.writeObjectFieldStart("district");
+            if (district.getCode() != null) {
+                jsonGenerator.writeNumberField("code", district.getCode());
+            }
+            jsonGenerator.writeStringField("name", district.getName());
+            jsonGenerator.writeStringField("fullName", district.getFullName());
+            jsonGenerator.writeEndObject();
+        }
+
+        ProvinceDTO province = orderDTO.getProvince();
+        if (province != null) {
+            jsonGenerator.writeObjectFieldStart("province");
+            if (province.getCode() != null) {
+                jsonGenerator.writeNumberField("code", province.getCode());
+            }
+            jsonGenerator.writeStringField("name", province.getName());
+            jsonGenerator.writeStringField("fullName", province.getFullName());
+            jsonGenerator.writeEndObject();
+        }
+
+        Set<OrderLogDTO> orderLogs = orderDTO.getOrderLogs();
+        if (orderLogs != null) {
+            jsonGenerator.writeArrayFieldStart("orderLogs");
+            orderLogs.forEach(orderLogDTO -> {
+                try {
+                    jsonGenerator.writeStartObject();
+                    if (orderLogDTO.getId() != null) {
+                        jsonGenerator.writeNumberField("id", orderLogDTO.getId());
+                    }
+                    jsonGenerator.writeStringField("time", orderLogDTO.getTime() != null ? orderLogDTO.getTime().toString() : null);
+                    jsonGenerator.writeStringField("description", orderLogDTO.getDescription());
+                    jsonGenerator.writeEndObject();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            jsonGenerator.writeEndArray();
+        }
         jsonGenerator.writeEndObject();
     }
 }

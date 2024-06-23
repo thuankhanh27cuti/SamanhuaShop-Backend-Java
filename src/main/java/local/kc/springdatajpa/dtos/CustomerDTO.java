@@ -4,6 +4,7 @@ import local.kc.springdatajpa.models.Role;
 import lombok.*;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Set;
 
 @Getter
@@ -21,4 +22,7 @@ public class CustomerDTO implements Serializable {
     String password;
     Role role;
     Set<OrderDTO> orders;
+    LocalDate birthday;
+    boolean isDeleted;
+    WardDTO ward;
 }

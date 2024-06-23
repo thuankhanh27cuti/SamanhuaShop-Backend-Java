@@ -25,6 +25,7 @@ public class BookDTOSerialization extends JsonSerializer<BookDTO> {
         }
         jsonGenerator.writeStringField("description", bookDTO.getDescription());
         jsonGenerator.writeStringField("createAt", bookDTO.getCreateAt() != null ? bookDTO.getCreateAt().toString(): null);
+        jsonGenerator.writeBooleanField("isDeleted", bookDTO.isDeleted());
 
         Set<CategoryDTO> categories = bookDTO.getCategories();
         if (categories != null) {
@@ -37,6 +38,7 @@ public class BookDTOSerialization extends JsonSerializer<BookDTO> {
                     }
                     jsonGenerator.writeStringField("name", categoryDTO.getName());
                     jsonGenerator.writeStringField("image", categoryDTO.getImage());
+                    jsonGenerator.writeBooleanField("isDeleted", categoryDTO.isDeleted());
                     jsonGenerator.writeEndObject();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -59,6 +61,7 @@ public class BookDTOSerialization extends JsonSerializer<BookDTO> {
                     if (optionDTO.getQuantity() != null) {
                         jsonGenerator.writeNumberField("quantity", optionDTO.getQuantity());
                     }
+                    jsonGenerator.writeBooleanField("isDeleted", optionDTO.isDeleted());
                     jsonGenerator.writeEndObject();
                 } catch (IOException e) {
                     throw new RuntimeException(e);

@@ -10,12 +10,12 @@ import java.util.Set;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class OptionDTO implements Serializable {
-    Integer id;
+public class DistrictDTO implements Serializable {
+    Integer code;
     String name;
-    Integer quantity;
-    String image;
-    BookDTO book;
-    Set<OrderDetailDTO> ordersDetails;
+    String fullName;
     boolean isDeleted;
+    Set<OrderDTO> orders;
+    ProvinceDTO province;
+    Set<WardDTO> wards;
 }
