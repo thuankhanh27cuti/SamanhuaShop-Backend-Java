@@ -18,4 +18,8 @@ public class WardDTO implements Serializable {
     DistrictDTO district;
     Set<OrderDTO> orders;
     Set<CustomerDTO> customers;
+
+    public WardDTO(Integer code) {
+        this.code = code;
+    }
 }

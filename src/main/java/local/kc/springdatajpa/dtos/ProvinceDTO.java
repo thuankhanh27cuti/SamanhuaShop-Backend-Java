@@ -17,4 +17,8 @@ public class ProvinceDTO implements Serializable {
     boolean isDeleted;
     Set<OrderDTO> orders;
     Set<DistrictDTO> districts;
+
+    public ProvinceDTO(Integer code) {
+        this.code = code;
+    }
 }

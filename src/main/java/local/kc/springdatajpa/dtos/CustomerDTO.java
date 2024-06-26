@@ -25,4 +25,8 @@ public class CustomerDTO implements Serializable {
     LocalDate birthday;
     boolean isDeleted;
     WardDTO ward;
+
+    public CustomerDTO(Integer id) {
+        this.id = id;
+    }
 }

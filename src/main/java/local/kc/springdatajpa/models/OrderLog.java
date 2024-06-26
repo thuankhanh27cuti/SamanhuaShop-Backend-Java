@@ -28,4 +28,17 @@ public class OrderLog {
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
+
+    public OrderLog(String description, Date time) {
+        this.description = description;
+        this.time = time;
+    }
+
+    @Override
+    public String toString() {
+        return "OrderLog{" +
+                "description='" + description + '\'' +
+                ", time=" + time +
+                '}';
+    }
 }

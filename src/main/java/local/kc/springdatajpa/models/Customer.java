@@ -68,6 +68,15 @@ public class Customer implements UserDetails {
         this.role = role;
     }
 
+    public Customer(Integer id, String name, String gender, LocalDate birthday, String image, String phone) {
+        this.id = id;
+        this.name = name;
+        this.gender = gender;
+        this.birthday = birthday;
+        this.image = image;
+        this.phone = phone;
+    }
+
     @Override
     public String toString() {
         return "Customer{" +

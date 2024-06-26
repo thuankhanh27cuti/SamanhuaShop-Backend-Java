@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum PaymentMethod {
-    MONEY(1), BANK(2);
+    MONEY(0), BANK(1);
     private final int value;
 
     PaymentMethod(int value) {

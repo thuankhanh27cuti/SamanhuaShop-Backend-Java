@@ -72,6 +72,17 @@ public class Order {
         this.orderStatus = orderStatus;
     }
 
+    public Order(Integer id, String consigneeName, String address, String phone, Date createAt, Date finishedAt, PaymentMethod paymentMethod, OrderStatus orderStatus) {
+        this.id = id;
+        this.consigneeName = consigneeName;
+        this.address = address;
+        this.phone = phone;
+        this.createAt = createAt;
+        this.finishedAt = finishedAt;
+        this.paymentMethod = paymentMethod;
+        this.orderStatus = orderStatus;
+    }
+
     public Order(Integer id) {
         this.id = id;
     }

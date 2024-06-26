@@ -1,9 +1,7 @@
 package local.kc.springdatajpa.dtos;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import local.kc.springdatajpa.models.OrderStatus;
 import local.kc.springdatajpa.models.PaymentMethod;
-import local.kc.springdatajpa.serializations.OrderDTOSerialization;
 import lombok.*;
 
 import java.io.Serializable;
@@ -15,7 +13,6 @@ import java.util.Set;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonSerialize(using = OrderDTOSerialization.class)
 public class OrderDTO implements Serializable {
     Integer id;
     String consigneeName;
@@ -31,4 +28,17 @@ public class OrderDTO implements Serializable {
     DistrictDTO district;
     ProvinceDTO province;
     Set<OrderLogDTO> orderLogs;
+
+    public OrderDTO(String consigneeName, String address, String phone, OrderStatus orderStatus, CustomerDTO customer, Set<OrderDetailDTO> orderDetails, PaymentMethod paymentMethod, WardDTO ward, DistrictDTO district, ProvinceDTO province) {
+        this.consigneeName = consigneeName;
+        this.address = address;
+        this.phone = phone;
+        this.orderStatus = orderStatus;
+        this.customer = customer;
+        this.orderDetails = orderDetails;
+        this.paymentMethod = paymentMethod;
+        this.ward = ward;
+        this.district = district;
+        this.province = province;
+    }
 }

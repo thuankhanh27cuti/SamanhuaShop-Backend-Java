@@ -1,7 +1,5 @@
 package local.kc.springdatajpa.dtos;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import local.kc.springdatajpa.serializations.BookDTOSerialization;
 import lombok.*;
 
 import java.io.Serializable;
@@ -13,7 +11,6 @@ import java.util.Set;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonSerialize(using = BookDTOSerialization.class)
 public class BookDTO implements Serializable {
     Integer id;
     String name;

@@ -4,11 +4,12 @@ import lombok.Getter;
 
 @Getter
 public enum OrderStatus {
-    PENDING(0),
-    PREPARING(1),
-    SHIPPING(2),
-    SUCCESS(3),
-    DECLINED(4);
+    WAIT_FOR_PAY(0),
+    PENDING(1),
+    PREPARING(2),
+    SHIPPING(3),
+    SUCCESS(4),
+    DECLINED(5);
 
     private final int value;
 

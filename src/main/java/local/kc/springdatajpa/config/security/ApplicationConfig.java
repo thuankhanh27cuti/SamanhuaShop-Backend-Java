@@ -1,6 +1,6 @@
 package local.kc.springdatajpa.config.security;
 
-import local.kc.springdatajpa.repositories.CustomerRepository;
+import local.kc.springdatajpa.repositories.v1.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

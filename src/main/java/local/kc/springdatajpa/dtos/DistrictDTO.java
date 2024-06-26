@@ -18,4 +18,8 @@ public class DistrictDTO implements Serializable {
     Set<OrderDTO> orders;
     ProvinceDTO province;
     Set<WardDTO> wards;
+
+    public DistrictDTO(Integer code) {
+        this.code = code;
+    }
 }
