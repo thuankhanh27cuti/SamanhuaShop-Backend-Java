@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface OrderLogRepository extends JpaRepository<OrderLog, Integer> {
 
-    @Query("SELECT new OrderLog(o.description, o.time) FROM OrderLog o WHERE o.order.id = ?1")
+    @Query("SELECT new OrderLog(o.id, o.description, o.time) FROM OrderLog o WHERE o.order.id = ?1 ORDER BY o.id ASC")
     List<OrderLog> findByOrderId(Integer orderId);
 }

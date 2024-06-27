@@ -14,8 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-
 @Service
 public class CustomerV2Service {
     private final CustomerV2Repository customerRepository;
@@ -59,5 +57,22 @@ public class CustomerV2Service {
 
         customer.setWard(ward);
         return ResponseEntity.ok(modelMapper.map(customer, CustomerDTO.class));
+    }
+
+    public ResponseEntity<?> updateCustomer(int id, CustomerDTO customerDTO) {
+        Customer customer = customerRepository.findById(id).orElse(null);
+        if (customer == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        customer.setName(customerDTO.getName());
+        customer.setGender(customerDTO.getGender());
+        customer.setImage(customerDTO.getImage());
+        customer.setPhone(customerDTO.getPhone());
+        customer.setBirthday(customerDTO.getBirthday());
+        customer.setWard(new Ward(customerDTO.getWard().getCode()));
+        customerRepository.save(customer);
+
+        return ResponseEntity.ok().build();
     }
 }

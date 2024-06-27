@@ -120,7 +120,7 @@ public class OrderService {
 
         orderLogRepository.save(orderLog);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(orderId);
     }
 
     public ResponseEntity<?> findById(int id) {
@@ -182,7 +182,25 @@ public class OrderService {
         order.setConsigneeName(orderDTO.getConsigneeName());
         order.setPhone(orderDTO.getPhone());
         order.setAddress(orderDTO.getAddress());
-        order.setOrderStatus(orderDTO.getOrderStatus());
+
+        OrderStatus orderStatus = orderDTO.getOrderStatus();
+
+        order.setOrderStatus(orderStatus);
+
+        OrderLog orderLog = OrderLog.builder()
+                .time(new Date())
+                .order(new Order(id))
+                .description(switch (orderStatus) {
+                    case WAIT_FOR_PAY -> "Chờ thanh toán";
+                    case PENDING -> "Đặt hàng thành công";
+                    case PREPARING -> "Đơn hàng đang được chuẩn bị";
+                    case SHIPPING -> "Đơn hàng bắt đầu được giao";
+                    case SUCCESS -> "Đã nhận được hàng";
+                    case DECLINED -> "Đơn hàng đã huỷ";
+                })
+                .build();
+
+        orderLogRepository.save(orderLog);
 
         orderRepository.save(order);
         return ResponseEntity.ok().build();
@@ -194,6 +212,21 @@ public class OrderService {
             return ResponseEntity.ok().build();
         }
         order.setOrderStatus(status);
+
+        OrderLog orderLog = OrderLog.builder()
+                .time(new Date())
+                .order(new Order(id))
+                .description(switch (status) {
+                    case WAIT_FOR_PAY -> "Chờ thanh toán";
+                    case PENDING -> "Đặt hàng thành công";
+                    case PREPARING -> "Đơn hàng đang được chuẩn bị";
+                    case SHIPPING -> "Đơn hàng bắt đầu được giao";
+                    case SUCCESS -> "Đã nhận được hàng";
+                    case DECLINED -> "Đơn hàng đã huỷ";
+                })
+                .build();
+
+        orderLogRepository.save(orderLog);
 
         orderRepository.save(order);
         return ResponseEntity.ok().build();

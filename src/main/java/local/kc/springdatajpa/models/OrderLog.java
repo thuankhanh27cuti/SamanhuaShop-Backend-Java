@@ -29,7 +29,8 @@ public class OrderLog {
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    public OrderLog(String description, Date time) {
+    public OrderLog(Integer id, String description, Date time) {
+        this.id = id;
         this.description = description;
         this.time = time;
     }

@@ -36,6 +36,10 @@ public class Ward {
     @OneToMany(mappedBy = "ward")
     private Set<Customer> customers;
 
+    public Ward(Integer code) {
+        this.code = code;
+    }
+
     public Ward(Integer code, String name, String fullName) {
         this.code = code;
         this.name = name;
