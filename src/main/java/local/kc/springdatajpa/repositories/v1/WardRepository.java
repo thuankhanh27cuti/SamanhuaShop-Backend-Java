@@ -18,4 +18,7 @@ public interface WardRepository extends JpaRepository<Ward, Integer> {
 
     @Query("SELECT new Ward(w.code, w.name, w.fullName) FROM Ward w LEFT JOIN w.customers c WHERE c.id = ?1")
     Optional<Ward> findByCustomerId(int id);
+
+    @Query("SELECT new Ward(w.code, w.name, w.fullName) FROM Ward w LEFT JOIN w.orders o WHERE o.id = ?1")
+    Optional<Ward> findByOrderId(int id);
 }

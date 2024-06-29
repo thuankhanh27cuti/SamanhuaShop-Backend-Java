@@ -50,11 +50,9 @@ public class OrderDetailService {
     }
 
     public ResponseEntity<?> findByOrderId(int id) {
-        Set<OrderDetail> orderDetails = orderDetailRepository.findByOrderId(id);
-        Set<OrderDetailDTO> orderDetailDTOS = orderDetails.stream()
+        return ResponseEntity.ok(orderDetailRepository.findByOrderId(id).stream()
                 .map(orderDetail -> modelMapper.map(orderDetail, OrderDetailDTO.class))
-                .collect(Collectors.toSet());
-        return ResponseEntity.ok(orderDetailDTOS);
+                .collect(Collectors.toSet()));
     }
 
     public ResponseEntity<?> countByOrderId(int id) {

@@ -34,13 +34,13 @@ public class CustomerController {
     }
 
     @GetMapping("/count/by-role/{role}")
-    public ResponseEntity<?> countByRole(@PathVariable(name = "role") Role role) {
-        return customerService.countByRole(role);
+    public ResponseEntity<?> countByRole(@PathVariable(name = "role") int value) {
+        return customerService.countByRole(value);
     }
 
     @GetMapping("/by-role/{role}")
-    public ResponseEntity<?> findByRoles(@PathVariable(name = "role") Role role, Pageable pageable) {
-        return customerService.findByRoles(role, pageable);
+    public ResponseEntity<?> findByRoles(@PathVariable(name = "role") int value, Pageable pageable) {
+        return customerService.findByRoles(value, pageable);
     }
 
     @PostMapping

@@ -1,25 +1,36 @@
 package local.kc.springdatajpa.services.v1;
 
+import local.kc.springdatajpa.converters.RoleConverter;
+import local.kc.springdatajpa.models.OrderStatus;
 import local.kc.springdatajpa.models.Role;
 import local.kc.springdatajpa.repositories.v1.GenericRepository;
+import local.kc.springdatajpa.utils.OrderStatusRes;
+import local.kc.springdatajpa.utils.RoleRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 
 @Service
 public class AdminService {
     private final GenericRepository genericRepository;
+    private final RoleConverter roleConverter;
 
     @Autowired
     public AdminService(GenericRepository genericRepository) {
         this.genericRepository = genericRepository;
+        this.roleConverter = new RoleConverter();
     }
 
     public ResponseEntity<?> getAllRoles() {
-        return ResponseEntity.ok(Role.values());
+        return ResponseEntity.ok(Arrays.stream(Role.values()).map(role -> new RoleRes(role.getValue(), role.toString())));
+    }
+
+    public ResponseEntity<?> getAllOrderStates() {
+        return ResponseEntity.ok(Arrays.stream(OrderStatus.values()).map(orderStatus -> new OrderStatusRes(orderStatus.getValue(), orderStatus.toString())));
     }
 
     public ResponseEntity<?> getTopSeller(Pageable pageable) {
@@ -42,9 +53,9 @@ public class AdminService {
         return ResponseEntity.ok(genericRepository.getCustomerStatistical(pageable));
     }
 
-    public ResponseEntity<?> getCustomerStatisticalByRole(Role role, Pageable pageable) {
+    public ResponseEntity<?> getCustomerStatisticalByRole(int value, Pageable pageable) {
+        Role role = roleConverter.convertToEntityAttribute(value);
         return ResponseEntity.ok(genericRepository.getCustomerStatistical(role, pageable));
-
     }
 
     public ResponseEntity<?> getRevenueByMonth(int month, int year) {

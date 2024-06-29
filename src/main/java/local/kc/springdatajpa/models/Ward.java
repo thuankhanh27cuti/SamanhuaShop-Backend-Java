@@ -45,4 +45,13 @@ public class Ward {
         this.name = name;
         this.fullName = fullName;
     }
+
+    @Override
+    public String toString() {
+        return "Ward{" +
+                "code=" + code +
+                ", name='" + name + '\'' +
+                ", fullName='" + fullName + '\'' +
+                '}';
+    }
 }

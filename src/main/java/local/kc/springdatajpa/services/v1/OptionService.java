@@ -72,7 +72,14 @@ public class OptionService {
     }
 
     public ResponseEntity<?> deleteOption(int id) {
-        optionRepository.deleteById(id);
+        Option option = optionRepository.findById(id).orElse(null);
+        if (option == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        option.setDeleted(true);
+        optionRepository.save(option);
+
         return ResponseEntity.ok().build();
     }
 }

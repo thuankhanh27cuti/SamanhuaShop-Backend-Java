@@ -108,7 +108,13 @@ public class BookService {
     }
 
     public ResponseEntity<?> deleteBook(int id) {
-        bookRepository.deleteById(id);
+        Book book = bookRepository.findById(id).orElse(null);
+        if (book == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        book.setDeleted(true);
+        bookRepository.save(book);
         return ResponseEntity.ok().build();
     }
 

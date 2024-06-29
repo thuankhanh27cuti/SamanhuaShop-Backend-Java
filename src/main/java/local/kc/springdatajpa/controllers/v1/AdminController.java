@@ -1,6 +1,5 @@
 package local.kc.springdatajpa.controllers.v1;
 
-import local.kc.springdatajpa.models.Role;
 import local.kc.springdatajpa.services.v1.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +22,11 @@ public class AdminController {
     @GetMapping("/all-roles")
     public ResponseEntity<?> getAllRoles() {
         return adminService.getAllRoles();
+    }
+
+    @GetMapping("/all-order-status")
+    public ResponseEntity<?> getAllOrderStates() {
+        return adminService.getAllOrderStates();
     }
 
     @GetMapping("/top-seller")
@@ -72,7 +76,7 @@ public class AdminController {
     }
 
     @GetMapping("/customer-statistical/by-role/{role}")
-    public ResponseEntity<?> getCustomerStatisticalByRole(@PathVariable(name = "role") Role role, Pageable pageable) {
-        return adminService.getCustomerStatisticalByRole(role, pageable);
+    public ResponseEntity<?> getCustomerStatisticalByRole(@PathVariable(name = "role") int value, Pageable pageable) {
+        return adminService.getCustomerStatisticalByRole(value, pageable);
     }
 }

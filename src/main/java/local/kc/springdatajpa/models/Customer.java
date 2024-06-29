@@ -58,6 +58,11 @@ public class Customer implements UserDetails {
     @JoinColumn(name = "ward_id")
     private Ward ward;
 
+    public Customer(Integer id, String username) {
+        this.id = id;
+        this.username = username;
+    }
+
     public Customer(Integer id, String name, String gender, String image, String phone, String username, Role role) {
         this.id = id;
         this.name = name;
@@ -75,6 +80,17 @@ public class Customer implements UserDetails {
         this.birthday = birthday;
         this.image = image;
         this.phone = phone;
+    }
+
+    public Customer(Integer id, String name, String gender, LocalDate birthday, String image, String phone, String username, Role role) {
+        this.id = id;
+        this.name = name;
+        this.gender = gender;
+        this.birthday = birthday;
+        this.image = image;
+        this.phone = phone;
+        this.username = username;
+        this.role = role;
     }
 
     @Override

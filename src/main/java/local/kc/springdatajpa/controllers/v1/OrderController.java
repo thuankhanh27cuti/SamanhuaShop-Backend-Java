@@ -1,7 +1,6 @@
 package local.kc.springdatajpa.controllers.v1;
 
 import local.kc.springdatajpa.dtos.OrderDTO;
-import local.kc.springdatajpa.models.OrderStatus;
 import local.kc.springdatajpa.services.v1.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -35,12 +34,12 @@ public class OrderController {
     }
 
     @GetMapping("/by-customer-lazy/{id}/by-status/{status}")
-    public ResponseEntity<?> findByCustomerIdLazyAndStatus(@PathVariable(name = "id") int id, @PathVariable(name = "status") OrderStatus status, Pageable pageable) {
+    public ResponseEntity<?> findByCustomerIdLazyAndStatus(@PathVariable(name = "id") int id, @PathVariable(name = "status") int status, Pageable pageable) {
         return orderService.findByCustomerIdLazyAndStatus(id, status, pageable);
     }
 
     @GetMapping("/by-status/{status}")
-    public ResponseEntity<?> findByOrderStatus(@PathVariable(name = "status") OrderStatus status, Pageable pageable) {
+    public ResponseEntity<?> findByOrderStatus(@PathVariable(name = "status") int status, Pageable pageable) {
         return orderService.findByOrderStatus(status, pageable);
     }
 
@@ -55,7 +54,7 @@ public class OrderController {
     }
 
     @GetMapping("/count/by-status/{status}")
-    public ResponseEntity<?> countByStatus(@PathVariable(name = "status") OrderStatus status) {
+    public ResponseEntity<?> countByStatus(@PathVariable(name = "status") int status) {
         return orderService.countByStatus(status);
     }
 
@@ -65,7 +64,7 @@ public class OrderController {
     }
 
     @GetMapping("/count/by-customer/{id}/by-status/{status}")
-    public ResponseEntity<?> countByCustomerIdAndStatusStatus(@PathVariable(name = "id") int id, @PathVariable(name = "status") OrderStatus status) {
+    public ResponseEntity<?> countByCustomerIdAndStatusStatus(@PathVariable(name = "id") int id, @PathVariable(name = "status") int status) {
         return orderService.countByCustomerIdAndStatusStatus(id, status);
     }
 
@@ -81,7 +80,7 @@ public class OrderController {
     }
 
     @PutMapping("/by-status/{id}")
-    public ResponseEntity<?> updateOrderStatus(@PathVariable(name = "id") int id, @RequestParam(name = "status") OrderStatus status) {
+    public ResponseEntity<?> updateOrderStatus(@PathVariable(name = "id") int id, @RequestParam(name = "status") int status) {
         return orderService.updateOrderStatus(id, status);
     }
 }

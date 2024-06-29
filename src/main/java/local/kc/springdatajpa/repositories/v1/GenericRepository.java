@@ -1,5 +1,6 @@
 package local.kc.springdatajpa.repositories.v1;
 
+import local.kc.springdatajpa.converters.RoleConverter;
 import local.kc.springdatajpa.models.Book;
 import local.kc.springdatajpa.models.Role;
 import local.kc.springdatajpa.utils.*;
@@ -17,10 +18,13 @@ import java.util.List;
 @Repository
 public class GenericRepository {
     private final JdbcTemplate jdbcTemplate;
+    private final RoleConverter roleConverter;
+
 
     @Autowired
     public GenericRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+        this.roleConverter = new RoleConverter();
     }
 
     public List<TopSellerBook> getTopSeller(Pageable pageable) {
@@ -46,7 +50,7 @@ public class GenericRepository {
         String sql = """
                 SELECT books.book_id AS id, book_name AS name, option_name, option_quantity AS quantity, option_id FROM books
                     LEFT JOIN options o on books.book_id = o.book_id
-                    ORDER BY option_quantity
+                ORDER BY option_quantity
                 LIMIT 5;
                 """;
         return jdbcTemplate.query(sql, (rs, rowNum) -> new BookStatus(
@@ -78,7 +82,7 @@ public class GenericRepository {
     public List<RevenueByDate> getRevenueByWeek() {
         String sql = """
                 SELECT CAST(order_created_at AS DATE ) AS date, SUM(order_total_price) AS revenue FROM orders
-                   LEFT JOIN samanhua_shop_jpa_v2_test.order_detail od on orders.order_id = od.order_id
+                   LEFT JOIN order_detail od on orders.order_id = od.order_id
                 WHERE CAST(order_created_at AS DATE ) BETWEEN DATE_SUB(CURRENT_DATE, INTERVAL 7 DAY ) AND CURRENT_DATE
                 GROUP BY date;
                 """;
@@ -102,11 +106,11 @@ public class GenericRepository {
                        customer_phone AS phone,
                        customer_role AS role,
                        customer_username AS username,
-                       COUNT(IF(order_status = 'PENDING', o.order_id, null)) AS order_remain,
-                       COUNT(IF(order_status = 'SHIPPING', o.order_id, null)) AS order_shipping,
-                       COUNT(IF(order_status = 'SUCCESS', o.order_id, null)) AS order_success,
+                       COUNT(IF(order_status = 1, o.order_id, null)) AS order_remain,
+                       COUNT(IF(order_status = 3, o.order_id, null)) AS order_shipping,
+                       COUNT(IF(order_status = 4, o.order_id, null)) AS order_success,
                        COUNT(order_id) AS count_order,
-                       MAX(IF(order_status = 'PENDING', order_created_at, null)) AS last_pending,
+                       MAX(IF(order_status = 1, order_created_at, null)) AS last_pending,
                        (SELECT SUM(od2.order_total_price)
                         FROM customers c2
                                  LEFT JOIN orders o2 ON c2.customer_id = o2.customer_id
@@ -120,7 +124,7 @@ public class GenericRepository {
             sql = sql + """
                 WHERE customer_role = ?
                 """;
-            args.add(role.name());
+            args.add(role.getValue());
         }
         sql = sql + """
                 GROUP BY c.customer_id
@@ -140,7 +144,7 @@ public class GenericRepository {
                 .image(rs.getString("image"))
                 .fullName(rs.getString("full_name"))
                 .phone(rs.getString("phone"))
-                .role(Role.valueOf(rs.getString("role")))
+                .role(roleConverter.convertToEntityAttribute(rs.getInt("role")))
                 .username(rs.getString("username"))
                 .orderRemain(rs.getInt("order_remain"))
                 .orderShipping(rs.getInt("order_shipping"))

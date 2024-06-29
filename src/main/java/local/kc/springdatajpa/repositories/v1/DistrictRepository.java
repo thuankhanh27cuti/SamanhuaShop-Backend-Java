@@ -18,4 +18,7 @@ public interface DistrictRepository extends JpaRepository<District, Integer> {
 
     @Query("SELECT new District(d.code, d.name, d.fullName) FROM District d LEFT JOIN d.wards w WHERE w.code = ?1")
     Optional<District> findByWardId(int id);
+
+    @Query("SELECT new District(d.code, d.name, d.fullName) FROM District d LEFT JOIN d.orders o WHERE o.id = ?1")
+    Optional<District> findByOrderId(int id);
 }

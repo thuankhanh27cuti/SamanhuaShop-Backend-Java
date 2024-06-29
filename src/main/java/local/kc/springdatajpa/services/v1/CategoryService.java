@@ -64,7 +64,13 @@ public class CategoryService {
     }
 
     public ResponseEntity<?> deleteCategory(int id) {
-        categoryRepository.deleteById(id);
+        Category category = categoryRepository.findById(id).orElse(null);
+        if (category == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        category.setDeleted(true);
+        categoryRepository.save(category);
         return ResponseEntity.ok().build();
     }
 }

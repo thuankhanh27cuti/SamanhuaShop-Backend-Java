@@ -19,4 +19,7 @@ public interface ProvinceRepository extends JpaRepository<Province, Integer> {
 
     @Query("SELECT new Province(p.code, p.name, p.fullName) FROM Province p LEFT JOIN p.districts d WHERE d.code = ?1")
     Optional<Province> findByDistrictId(int id);
+
+    @Query("SELECT new Province(p.code, p.name, p.fullName) FROM Province p LEFT JOIN p.orders o WHERE o.id = ?1")
+    Optional<Province> findByOrderId(int id);
 }

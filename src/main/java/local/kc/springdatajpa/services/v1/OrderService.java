@@ -1,10 +1,9 @@
 package local.kc.springdatajpa.services.v1;
 
+import local.kc.springdatajpa.converters.OrderStatusConverter;
 import local.kc.springdatajpa.dtos.OrderDTO;
 import local.kc.springdatajpa.models.*;
-import local.kc.springdatajpa.repositories.v1.OrderDetailRepository;
-import local.kc.springdatajpa.repositories.v1.OrderLogRepository;
-import local.kc.springdatajpa.repositories.v1.OrderRepository;
+import local.kc.springdatajpa.repositories.v1.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -20,46 +19,87 @@ public class OrderService {
     private final ModelMapper modelMapper;
     private final OrderDetailRepository orderDetailRepository;
     private final OrderLogRepository orderLogRepository;
+    private final CustomerRepository customerRepository;
+    private final WardRepository wardRepository;
+    private final DistrictRepository districtRepository;
+    private final ProvinceRepository provinceRepository;
+    private final OrderStatusConverter orderStatusConverter;
 
     @Autowired
-    public OrderService(OrderRepository orderRepository, ModelMapper modelMapper, OrderDetailRepository orderDetailRepository, OrderLogRepository orderLogRepository) {
+    public OrderService(OrderRepository orderRepository, ModelMapper modelMapper, OrderDetailRepository orderDetailRepository, OrderLogRepository orderLogRepository, CustomerRepository customerRepository, WardRepository wardRepository, DistrictRepository districtRepository, ProvinceRepository provinceRepository) {
         this.orderRepository = orderRepository;
         this.modelMapper = modelMapper;
         this.orderDetailRepository = orderDetailRepository;
         this.orderLogRepository = orderLogRepository;
+        this.customerRepository = customerRepository;
+        this.wardRepository = wardRepository;
+        this.districtRepository = districtRepository;
+        this.provinceRepository = provinceRepository;
+        this.orderStatusConverter = new OrderStatusConverter();
     }
 
     public ResponseEntity<?> findAll(Pageable pageable) {
         return ResponseEntity.ok(orderRepository.findAllLazy(pageable)
                 .stream()
                 .peek(order -> {
-                    order.setOrderDetails(null);
-
-                    Customer customer = order.getCustomer();
-                    order.setCustomer(Customer.builder()
+                    customerRepository.findByOrderId(order.getId()).ifPresent(customer -> order.setCustomer(Customer.builder()
                             .id(customer.getId())
                             .username(customer.getUsername())
                             .isDeleted(customer.isDeleted())
                             .build()
-                    );
+                    ));
+
+                    wardRepository.findByOrderId(order.getId()).ifPresent(ward -> order.setWard(Ward.builder()
+                            .code(ward.getCode())
+                            .name(ward.getName())
+                            .fullName(ward.getFullName())
+                            .build()));
+
+                    districtRepository.findByOrderId(order.getId()).ifPresent(district -> order.setDistrict(District.builder()
+                            .code(district.getCode())
+                            .name(district.getName())
+                            .fullName(district.getFullName())
+                            .build()));
+
+                    provinceRepository.findByOrderId(order.getId()).ifPresent(province -> order.setProvince(Province.builder()
+                            .code(province.getCode())
+                            .name(province.getName())
+                            .fullName(province.getFullName())
+                            .build()));
                 })
                 .map(order -> modelMapper.map(order, OrderDTO.class))
                 .toList());
     }
 
-    public ResponseEntity<?> findByOrderStatus(OrderStatus status, Pageable pageable) {
-        return ResponseEntity.ok(orderRepository.findByOrderStatusLazy(status, pageable)
+    public ResponseEntity<?> findByOrderStatus(int status, Pageable pageable) {
+        OrderStatus orderStatus = orderStatusConverter.convertToEntityAttribute(status);
+        return ResponseEntity.ok(orderRepository.findByOrderStatusLazy(orderStatus, pageable)
                 .stream()
                 .peek(order -> {
-                    order.setOrderDetails(null);
-
-                    Customer customer = order.getCustomer();
-                    order.setCustomer(Customer.builder()
+                    customerRepository.findByOrderId(order.getId()).ifPresent(customer -> order.setCustomer(Customer.builder()
                             .id(customer.getId())
                             .username(customer.getUsername())
                             .isDeleted(customer.isDeleted())
                             .build()
-                    );
+                    ));
+
+                    wardRepository.findByOrderId(order.getId()).ifPresent(ward -> order.setWard(Ward.builder()
+                            .code(ward.getCode())
+                            .name(ward.getName())
+                            .fullName(ward.getFullName())
+                            .build()));
+
+                    districtRepository.findByOrderId(order.getId()).ifPresent(district -> order.setDistrict(District.builder()
+                            .code(district.getCode())
+                            .name(district.getName())
+                            .fullName(district.getFullName())
+                            .build()));
+
+                    provinceRepository.findByOrderId(order.getId()).ifPresent(province -> order.setProvince(Province.builder()
+                            .code(province.getCode())
+                            .name(province.getName())
+                            .fullName(province.getFullName())
+                            .build()));
                 })
                 .map(order -> modelMapper.map(order, OrderDTO.class))
                 .toList());
@@ -80,9 +120,10 @@ public class OrderService {
                         .toList());
     }
 
-    public ResponseEntity<?> findByCustomerIdLazyAndStatus(int id, OrderStatus status, Pageable pageable) {
+    public ResponseEntity<?> findByCustomerIdLazyAndStatus(int id, int status, Pageable pageable) {
+        OrderStatus orderStatus = orderStatusConverter.convertToEntityAttribute(status);
         return ResponseEntity
-                .ok(orderRepository.findByCustomerIdLazyAndStatus(id, status, pageable).stream()
+                .ok(orderRepository.findByCustomerIdLazyAndStatus(id, orderStatus, pageable).stream()
                         .map(order -> modelMapper.map(order, OrderDTO.class))
                         .toList());
     }
@@ -161,16 +202,18 @@ public class OrderService {
         return ResponseEntity.ok(orderRepository.count());
     }
 
-    public ResponseEntity<?> countByStatus(OrderStatus status) {
-        return ResponseEntity.ok(orderRepository.countByStatus(status));
+    public ResponseEntity<?> countByStatus(int status) {
+        OrderStatus orderStatus = orderStatusConverter.convertToEntityAttribute(status);
+        return ResponseEntity.ok(orderRepository.countByStatus(orderStatus));
     }
 
     public ResponseEntity<?> countByCustomerId(int id) {
         return ResponseEntity.ok(orderRepository.countByCustomerId(id));
     }
 
-    public ResponseEntity<?> countByCustomerIdAndStatusStatus(int id, OrderStatus status) {
-        return ResponseEntity.ok(orderRepository.countByCustomerIdAndStatus(id, status));
+    public ResponseEntity<?> countByCustomerIdAndStatusStatus(int id, int status) {
+        OrderStatus orderStatus = orderStatusConverter.convertToEntityAttribute(status);
+        return ResponseEntity.ok(orderRepository.countByCustomerIdAndStatus(id, orderStatus));
     }
 
     public ResponseEntity<?> updateOrder(int id, OrderDTO orderDTO) {
@@ -206,17 +249,19 @@ public class OrderService {
         return ResponseEntity.ok().build();
     }
 
-    public ResponseEntity<?> updateOrderStatus(int id, OrderStatus status) {
+    public ResponseEntity<?> updateOrderStatus(int id, int status) {
+        OrderStatus orderStatus = orderStatusConverter.convertToEntityAttribute(status);
+
         Order order = orderRepository.findById(id).orElse(null);
         if (order == null) {
             return ResponseEntity.ok().build();
         }
-        order.setOrderStatus(status);
+        order.setOrderStatus(orderStatus);
 
         OrderLog orderLog = OrderLog.builder()
                 .time(new Date())
                 .order(new Order(id))
-                .description(switch (status) {
+                .description(switch (orderStatus) {
                     case WAIT_FOR_PAY -> "Chờ thanh toán";
                     case PENDING -> "Đặt hàng thành công";
                     case PREPARING -> "Đơn hàng đang được chuẩn bị";

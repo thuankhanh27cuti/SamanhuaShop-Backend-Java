@@ -1,5 +1,7 @@
 package local.kc.springdatajpa.dtos;
 
+import local.kc.springdatajpa.converters.OrderStatusConverter;
+import local.kc.springdatajpa.converters.PaymentMethodConverter;
 import local.kc.springdatajpa.models.OrderStatus;
 import local.kc.springdatajpa.models.PaymentMethod;
 import lombok.*;
@@ -40,5 +42,25 @@ public class OrderDTO implements Serializable {
         this.ward = ward;
         this.district = district;
         this.province = province;
+    }
+
+    public OrderDTO(Integer id, String consigneeName, String address, String phone, Date createAt, Date finishedAt, int orderStatus, CustomerDTO customer, Set<OrderDetailDTO> orderDetails, int paymentMethod, WardDTO ward, DistrictDTO district, ProvinceDTO province, Set<OrderLogDTO> orderLogs) {
+        OrderStatusConverter orderStatusConverter = new OrderStatusConverter();
+        PaymentMethodConverter paymentMethodConverter = new PaymentMethodConverter();
+
+        this.id = id;
+        this.consigneeName = consigneeName;
+        this.address = address;
+        this.phone = phone;
+        this.createAt = createAt;
+        this.finishedAt = finishedAt;
+        this.orderStatus = orderStatusConverter.convertToEntityAttribute(orderStatus);
+        this.customer = customer;
+        this.orderDetails = orderDetails;
+        this.paymentMethod = paymentMethodConverter.convertToEntityAttribute(paymentMethod);
+        this.ward = ward;
+        this.district = district;
+        this.province = province;
+        this.orderLogs = orderLogs;
     }
 }
