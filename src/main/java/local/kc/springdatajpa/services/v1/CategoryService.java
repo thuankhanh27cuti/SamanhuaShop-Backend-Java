@@ -21,6 +21,13 @@ public class CategoryService {
         this.modelMapper = modelMapper;
     }
 
+    public ResponseEntity<?> findAll() {
+        return ResponseEntity.ok(categoryRepository.findAllLazy().stream()
+                .map(category -> modelMapper.map(category, CategoryDTO.class))
+                .toList());
+    }
+
+
     public ResponseEntity<?> findAll(Pageable pageable) {
         return ResponseEntity.ok(categoryRepository.findAllLazy(pageable).stream()
                 .map(category -> modelMapper.map(category, CategoryDTO.class))
@@ -69,7 +76,7 @@ public class CategoryService {
             return ResponseEntity.notFound().build();
         }
 
-        category.setDeleted(true);
+        category.setDeleted(!category.isDeleted());
         categoryRepository.save(category);
         return ResponseEntity.ok().build();
     }

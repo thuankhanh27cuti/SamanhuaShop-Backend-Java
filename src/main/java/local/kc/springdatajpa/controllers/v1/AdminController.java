@@ -69,14 +69,4 @@ public class AdminController {
     public ResponseEntity<?> getRevenueAllTime() {
         return adminService.getRevenueAllTime();
     }
-
-    @GetMapping("/customer-statistical")
-    public ResponseEntity<?> getCustomerStatistical(Pageable pageable) {
-        return adminService.getCustomerStatistical(pageable);
-    }
-
-    @GetMapping("/customer-statistical/by-role/{role}")
-    public ResponseEntity<?> getCustomerStatisticalByRole(@PathVariable(name = "role") int value, Pageable pageable) {
-        return adminService.getCustomerStatisticalByRole(value, pageable);
-    }
 }

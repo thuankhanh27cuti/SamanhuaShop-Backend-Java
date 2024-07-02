@@ -20,53 +20,28 @@ public class OrderService {
     private final OrderDetailRepository orderDetailRepository;
     private final OrderLogRepository orderLogRepository;
     private final CustomerRepository customerRepository;
-    private final WardRepository wardRepository;
-    private final DistrictRepository districtRepository;
-    private final ProvinceRepository provinceRepository;
     private final OrderStatusConverter orderStatusConverter;
 
     @Autowired
-    public OrderService(OrderRepository orderRepository, ModelMapper modelMapper, OrderDetailRepository orderDetailRepository, OrderLogRepository orderLogRepository, CustomerRepository customerRepository, WardRepository wardRepository, DistrictRepository districtRepository, ProvinceRepository provinceRepository) {
+    public OrderService(OrderRepository orderRepository, ModelMapper modelMapper, OrderDetailRepository orderDetailRepository, OrderLogRepository orderLogRepository, CustomerRepository customerRepository) {
         this.orderRepository = orderRepository;
         this.modelMapper = modelMapper;
         this.orderDetailRepository = orderDetailRepository;
         this.orderLogRepository = orderLogRepository;
         this.customerRepository = customerRepository;
-        this.wardRepository = wardRepository;
-        this.districtRepository = districtRepository;
-        this.provinceRepository = provinceRepository;
         this.orderStatusConverter = new OrderStatusConverter();
     }
 
     public ResponseEntity<?> findAll(Pageable pageable) {
         return ResponseEntity.ok(orderRepository.findAllLazy(pageable)
                 .stream()
-                .peek(order -> {
-                    customerRepository.findByOrderId(order.getId()).ifPresent(customer -> order.setCustomer(Customer.builder()
-                            .id(customer.getId())
-                            .username(customer.getUsername())
-                            .isDeleted(customer.isDeleted())
-                            .build()
-                    ));
-
-                    wardRepository.findByOrderId(order.getId()).ifPresent(ward -> order.setWard(Ward.builder()
-                            .code(ward.getCode())
-                            .name(ward.getName())
-                            .fullName(ward.getFullName())
-                            .build()));
-
-                    districtRepository.findByOrderId(order.getId()).ifPresent(district -> order.setDistrict(District.builder()
-                            .code(district.getCode())
-                            .name(district.getName())
-                            .fullName(district.getFullName())
-                            .build()));
-
-                    provinceRepository.findByOrderId(order.getId()).ifPresent(province -> order.setProvince(Province.builder()
-                            .code(province.getCode())
-                            .name(province.getName())
-                            .fullName(province.getFullName())
-                            .build()));
-                })
+                .peek(order -> customerRepository.findByOrderId(order.getId())
+                        .ifPresent(customer -> order.setCustomer(Customer.builder()
+                        .id(customer.getId())
+                        .username(customer.getUsername())
+                        .isDeleted(customer.isDeleted())
+                        .build()
+                )))
                 .map(order -> modelMapper.map(order, OrderDTO.class))
                 .toList());
     }
@@ -75,32 +50,13 @@ public class OrderService {
         OrderStatus orderStatus = orderStatusConverter.convertToEntityAttribute(status);
         return ResponseEntity.ok(orderRepository.findByOrderStatusLazy(orderStatus, pageable)
                 .stream()
-                .peek(order -> {
-                    customerRepository.findByOrderId(order.getId()).ifPresent(customer -> order.setCustomer(Customer.builder()
-                            .id(customer.getId())
-                            .username(customer.getUsername())
-                            .isDeleted(customer.isDeleted())
-                            .build()
-                    ));
-
-                    wardRepository.findByOrderId(order.getId()).ifPresent(ward -> order.setWard(Ward.builder()
-                            .code(ward.getCode())
-                            .name(ward.getName())
-                            .fullName(ward.getFullName())
-                            .build()));
-
-                    districtRepository.findByOrderId(order.getId()).ifPresent(district -> order.setDistrict(District.builder()
-                            .code(district.getCode())
-                            .name(district.getName())
-                            .fullName(district.getFullName())
-                            .build()));
-
-                    provinceRepository.findByOrderId(order.getId()).ifPresent(province -> order.setProvince(Province.builder()
-                            .code(province.getCode())
-                            .name(province.getName())
-                            .fullName(province.getFullName())
-                            .build()));
-                })
+                .peek(order -> customerRepository.findByOrderId(order.getId())
+                        .ifPresent(customer -> order.setCustomer(Customer.builder()
+                        .id(customer.getId())
+                        .username(customer.getUsername())
+                        .isDeleted(customer.isDeleted())
+                        .build()
+                )))
                 .map(order -> modelMapper.map(order, OrderDTO.class))
                 .toList());
     }
@@ -146,20 +102,7 @@ public class OrderService {
 
         OrderStatus orderStatus = orderDTO.getOrderStatus();
 
-        OrderLog orderLog = OrderLog.builder()
-                .time(new Date())
-                .order(new Order(orderId))
-                .description(switch (orderStatus) {
-                    case WAIT_FOR_PAY -> "Chờ thanh toán";
-                    case PENDING -> "Đặt hàng thành công";
-                    case PREPARING -> "Đơn hàng đang được chuẩn bị";
-                    case SHIPPING -> "Đơn hàng bắt đầu được giao";
-                    case SUCCESS -> "Đã nhận được hàng";
-                    case DECLINED -> "Đơn hàng đã huỷ";
-                })
-                .build();
-
-        orderLogRepository.save(orderLog);
+        saveOrderLog(orderId, orderStatus);
 
         return ResponseEntity.ok(orderId);
     }
@@ -170,6 +113,8 @@ public class OrderService {
             Ward ward = order.getWard();
             District district = order.getDistrict();
             Province province = order.getProvince();
+
+            order.setOrderDetails(new HashSet<>());
 
             order.setCustomer(Customer.builder()
                     .id(customer.getId())
@@ -230,20 +175,7 @@ public class OrderService {
 
         order.setOrderStatus(orderStatus);
 
-        OrderLog orderLog = OrderLog.builder()
-                .time(new Date())
-                .order(new Order(id))
-                .description(switch (orderStatus) {
-                    case WAIT_FOR_PAY -> "Chờ thanh toán";
-                    case PENDING -> "Đặt hàng thành công";
-                    case PREPARING -> "Đơn hàng đang được chuẩn bị";
-                    case SHIPPING -> "Đơn hàng bắt đầu được giao";
-                    case SUCCESS -> "Đã nhận được hàng";
-                    case DECLINED -> "Đơn hàng đã huỷ";
-                })
-                .build();
-
-        orderLogRepository.save(orderLog);
+        saveOrderLog(id, orderStatus);
 
         orderRepository.save(order);
         return ResponseEntity.ok().build();
@@ -258,9 +190,16 @@ public class OrderService {
         }
         order.setOrderStatus(orderStatus);
 
+        saveOrderLog(id, orderStatus);
+
+        orderRepository.save(order);
+        return ResponseEntity.ok().build();
+    }
+
+    private void saveOrderLog(Integer orderId, OrderStatus orderStatus) {
         OrderLog orderLog = OrderLog.builder()
                 .time(new Date())
-                .order(new Order(id))
+                .order(new Order(orderId))
                 .description(switch (orderStatus) {
                     case WAIT_FOR_PAY -> "Chờ thanh toán";
                     case PENDING -> "Đặt hàng thành công";
@@ -272,8 +211,5 @@ public class OrderService {
                 .build();
 
         orderLogRepository.save(orderLog);
-
-        orderRepository.save(order);
-        return ResponseEntity.ok().build();
     }
 }

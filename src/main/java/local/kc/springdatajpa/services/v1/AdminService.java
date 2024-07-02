@@ -1,6 +1,5 @@
 package local.kc.springdatajpa.services.v1;
 
-import local.kc.springdatajpa.converters.RoleConverter;
 import local.kc.springdatajpa.models.OrderStatus;
 import local.kc.springdatajpa.models.Role;
 import local.kc.springdatajpa.repositories.v1.GenericRepository;
@@ -17,12 +16,10 @@ import java.util.Arrays;
 @Service
 public class AdminService {
     private final GenericRepository genericRepository;
-    private final RoleConverter roleConverter;
 
     @Autowired
     public AdminService(GenericRepository genericRepository) {
         this.genericRepository = genericRepository;
-        this.roleConverter = new RoleConverter();
     }
 
     public ResponseEntity<?> getAllRoles() {
@@ -47,15 +44,6 @@ public class AdminService {
 
     public ResponseEntity<?> getRevenueByWeek() {
         return ResponseEntity.ok(genericRepository.getRevenueByWeek());
-    }
-
-    public ResponseEntity<?> getCustomerStatistical(Pageable pageable) {
-        return ResponseEntity.ok(genericRepository.getCustomerStatistical(pageable));
-    }
-
-    public ResponseEntity<?> getCustomerStatisticalByRole(int value, Pageable pageable) {
-        Role role = roleConverter.convertToEntityAttribute(value);
-        return ResponseEntity.ok(genericRepository.getCustomerStatistical(role, pageable));
     }
 
     public ResponseEntity<?> getRevenueByMonth(int month, int year) {

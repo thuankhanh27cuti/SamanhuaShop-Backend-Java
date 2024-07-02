@@ -62,6 +62,16 @@ public class Book {
         this.createAt = createAt;
     }
 
+    public Book(Integer id, String name, String image, Integer price, String description, Date createAt, boolean isDeleted) {
+        this.id = id;
+        this.name = name;
+        this.image = image;
+        this.price = price;
+        this.description = description;
+        this.createAt = createAt;
+        this.isDeleted = isDeleted;
+    }
+
     @Override
     public String toString() {
         return "Book{" +

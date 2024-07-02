@@ -63,16 +63,22 @@ public class CustomerService {
     }
 
     public ResponseEntity<?> findAll(Pageable pageable) {
-        return ResponseEntity.ok(customerRepository.findAllLazy(pageable));
-    }
-
-    public ResponseEntity<?> count() {
-        return ResponseEntity.ok(customerRepository.count());
+        return ResponseEntity.ok(customerRepository.findAllLazy(pageable)
+                .stream()
+                .map(customer -> modelMapper.map(customer, CustomerDTO.class))
+                .toList());
     }
 
     public ResponseEntity<?> findByRoles(int value, Pageable pageable) {
         Role role = roleConverter.convertToEntityAttribute(value);
-        return ResponseEntity.ok(customerRepository.findByRoles(role, pageable));
+        return ResponseEntity.ok(customerRepository.findByRoles(role, pageable)
+                .stream()
+                .map(customer -> modelMapper.map(customer, CustomerDTO.class))
+                .toList());
+    }
+
+    public ResponseEntity<?> count() {
+        return ResponseEntity.ok(customerRepository.count());
     }
 
     public ResponseEntity<?> countByRole(int value) {
@@ -99,6 +105,9 @@ public class CustomerService {
     }
 
     public ResponseEntity<?> updateCustomer(int id, CustomerDTO customerDTO) {
+        Ward ward = customerDTO.getWard() != null ? new Ward(customerDTO.getWard().getCode()) : null;
+        System.out.println(ward);
+
         Customer customer = customerRepository.findById(id).orElse(null);
         if (customer == null) {
             return ResponseEntity.notFound().build();
@@ -110,7 +119,7 @@ public class CustomerService {
         customer.setGender(customerDTO.getGender());
         customer.setPhone(customerDTO.getPhone());
         customer.setRole(customerDTO.getRole());
-        customer.setWard(new Ward(customerDTO.getWard().getCode()));
+        customer.setWard(ward);
         customerRepository.save(customer);
 
         return ResponseEntity.ok().build();
@@ -122,7 +131,7 @@ public class CustomerService {
             return ResponseEntity.notFound().build();
         }
 
-        customer.setDeleted(true);
+        customer.setDeleted(!customer.isDeleted());
         customerRepository.save(customer);
         return ResponseEntity.ok().build();
     }

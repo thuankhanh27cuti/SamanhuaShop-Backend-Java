@@ -27,11 +27,6 @@ public class BookController {
         return bookService.findById(id);
     }
 
-    @GetMapping("/by-name")
-    public ResponseEntity<?> findByName(@RequestParam(name = "name") String name) {
-        return bookService.findByName(name);
-    }
-
     @GetMapping("/by-category/{id}")
     public ResponseEntity<?> findByCategoryId(Pageable pageable, @PathVariable(name = "id") int categoryId) {
         return bookService.findByCategoryId(categoryId, pageable);

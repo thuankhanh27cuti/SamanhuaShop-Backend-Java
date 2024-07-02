@@ -113,13 +113,8 @@ public class BookService {
             return ResponseEntity.notFound().build();
         }
 
-        book.setDeleted(true);
+        book.setDeleted(!book.isDeleted());
         bookRepository.save(book);
         return ResponseEntity.ok().build();
-    }
-
-    public ResponseEntity<?> findByName(String name) {
-        List<Book> books = bookRepository.findByNameLikeIgnoreCase(name);
-        return ResponseEntity.ok(books);
     }
 }

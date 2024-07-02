@@ -22,6 +22,11 @@ public class CategoryController {
         return categoryService.findAll(pageable);
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<?> findAll() {
+        return categoryService.findAll();
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable(name = "id") int id) {
         return categoryService.findById(id);

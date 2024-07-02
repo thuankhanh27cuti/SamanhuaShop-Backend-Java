@@ -14,7 +14,7 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
     @Query("SELECT new Book(b.id, b.name, b.image, b.price, b.description, b.createAt) FROM Book b WHERE b.id = ?1")
     Optional<Book> findByIdLazy(int id);
 
-    @Query("SELECT new Book(b.id, b.name, b.image, b.price, b.description, b.createAt) FROM Book b")
+    @Query("SELECT new Book(b.id, b.name, b.image, b.price, b.description, b.createAt, b.isDeleted) FROM Book b")
     List<Book> findAllLazy(Pageable pageable);
 
     @Query("SELECT new Book(b.id, b.name, b.image, b.price, b.description, b.createAt) FROM Book b LEFT JOIN b.categories c WHERE c.id = ?1")
@@ -25,10 +25,4 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
 
     @Query("SELECT COUNT(b) FROM Book b INNER JOIN b.categories c WHERE c.id = ?1")
     long countByCategoryId(int id);
-
-    @Query("select b from Book b where upper(b.name) like upper(?1)")
-    List<Book> findByNameLikeIgnoreCase(String name);
-
-    @Query("select b from Book b where upper(b.name) like upper(concat(?1, '%'))")
-    List<Book> findByNameStartsWithIgnoreCase(String name);
 }

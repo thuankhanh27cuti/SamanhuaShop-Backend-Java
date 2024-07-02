@@ -1,7 +1,6 @@
 package local.kc.springdatajpa.controllers.v1;
 
 import local.kc.springdatajpa.dtos.CustomerDTO;
-import local.kc.springdatajpa.models.Role;
 import local.kc.springdatajpa.services.v1.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;

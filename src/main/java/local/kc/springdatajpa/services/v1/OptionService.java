@@ -77,7 +77,7 @@ public class OptionService {
             return ResponseEntity.notFound().build();
         }
 
-        option.setDeleted(true);
+        option.setDeleted(!option.isDeleted());
         optionRepository.save(option);
 
         return ResponseEntity.ok().build();

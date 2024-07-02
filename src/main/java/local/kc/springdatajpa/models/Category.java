@@ -33,10 +33,22 @@ public class Category {
             inverseJoinColumns = @JoinColumn(name = "book_id"))
     private Set<Book> books;
 
+    public Category(Integer id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public Category(Integer id, String name, String image) {
         this.id = id;
         this.name = name;
         this.image = image;
+    }
+
+    public Category(Integer id, String name, String image, boolean isDeleted) {
+        this.id = id;
+        this.name = name;
+        this.image = image;
+        this.isDeleted = isDeleted;
     }
 
     @Override

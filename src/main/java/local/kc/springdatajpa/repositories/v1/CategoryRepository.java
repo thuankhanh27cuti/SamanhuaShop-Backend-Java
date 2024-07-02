@@ -14,10 +14,13 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     @Query("SELECT new Category(c.id, c.name, c.image) FROM Category c WHERE c.id = ?1")
     Optional<Category> findByIdLazy(int id);
 
-    @Query("SELECT new Category(c.id, c.name, c.image) FROM Category c")
+    @Query("SELECT new Category(c.id, c.name) FROM Category c")
+    List<Category> findAllLazy();
+
+    @Query("SELECT new Category(c.id, c.name, c.image,c.isDeleted) FROM Category c")
     List<Category> findAllLazy(Pageable pageable);
 
-    @Query("SELECT new Category(c.id, c.name, c.image) FROM Category c LEFT JOIN c.books b WHERE b.id = ?1")
+    @Query("SELECT new Category(c.id, c.name, c.image,c.isDeleted) FROM Category c LEFT JOIN c.books b WHERE b.id = ?1")
     List<Category> findByBookIdLazy(int bookId);
 
 }

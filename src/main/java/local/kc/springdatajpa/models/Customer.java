@@ -63,6 +63,16 @@ public class Customer implements UserDetails {
         this.username = username;
     }
 
+    public Customer(Integer id, String name, String image, String phone, String username, Role role, boolean isDeleted) {
+        this.id = id;
+        this.name = name;
+        this.image = image;
+        this.phone = phone;
+        this.username = username;
+        this.role = role;
+        this.isDeleted = isDeleted;
+    }
+
     public Customer(Integer id, String name, String gender, String image, String phone, String username, Role role) {
         this.id = id;
         this.name = name;
