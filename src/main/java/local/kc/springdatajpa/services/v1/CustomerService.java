@@ -62,6 +62,11 @@ public class CustomerService {
         return ResponseEntity.ok(modelMapper.map(customer, CustomerDTO.class));
     }
 
+    public ResponseEntity<?> findByIdLazy(int id) {
+        return ResponseEntity.of(customerRepository.findByIdLazy(id)
+                .map(customer -> modelMapper.map(customer, CustomerDTO.class)));
+    }
+
     public ResponseEntity<?> findAll(Pageable pageable) {
         return ResponseEntity.ok(customerRepository.findAllLazy(pageable)
                 .stream()

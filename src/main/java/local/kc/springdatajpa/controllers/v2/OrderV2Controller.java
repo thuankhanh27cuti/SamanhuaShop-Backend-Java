@@ -28,4 +28,19 @@ public class OrderV2Controller {
     public ResponseEntity<?> findByCustomerId(@PathVariable(name = "id") int id, Pageable pageable) {
         return orderService.findByCustomerId(id, pageable);
     }
+
+    @GetMapping("/by-customer/{id}/by-status/{status}")
+    public ResponseEntity<?> findByCustomerIdAndStatus(@PathVariable(name = "id") int id, @PathVariable(name = "status") int status, Pageable pageable) {
+        return orderService.findByCustomerIdAndStatus(id, status, pageable);
+    }
+
+    @GetMapping("/count/by-customer/{id}")
+    public ResponseEntity<?> countByCustomerId(@PathVariable(name = "id") int id) {
+        return orderService.countByCustomerId(id);
+    }
+
+    @GetMapping("/count/by-customer/{id}/by-status/{status}")
+    public ResponseEntity<?> countByCustomerIdAndStatusStatus(@PathVariable(name = "id") int id, @PathVariable(name = "status") int status) {
+        return orderService.countByCustomerIdAndStatusStatus(id, status);
+    }
 }

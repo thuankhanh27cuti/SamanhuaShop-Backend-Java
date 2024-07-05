@@ -15,4 +15,7 @@ public interface OrderDetailRepository extends JpaRepository<OrderDetail, OrderD
 
     @Query("SELECT COUNT(o) FROM OrderDetail o WHERE o.order.id = ?1")
     long countByOrderId(Integer id);
+
+    @Query("SELECT COALESCE(SUM(od.price), 0) FROM OrderDetail od WHERE od.order.customer.id = ?1 AND od.order.orderStatus = 4")
+    long getRevenuesOfCustomerById(int id);
 }

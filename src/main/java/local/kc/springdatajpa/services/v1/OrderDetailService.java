@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,5 +56,9 @@ public class OrderDetailService {
 
     public ResponseEntity<?> countByOrderId(int id) {
         return ResponseEntity.ok(orderDetailRepository.countByOrderId(id));
+    }
+
+    public ResponseEntity<?> getRevenuesOfCustomerById(int id) {
+        return ResponseEntity.ok(orderDetailRepository.getRevenuesOfCustomerById(id));
     }
 }

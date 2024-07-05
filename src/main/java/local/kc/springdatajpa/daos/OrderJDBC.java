@@ -42,10 +42,6 @@ public class OrderJDBC {
         this.orderLogRepository = orderLogRepository;
     }
 
-    public List<Order> findByCustomerId(int id) {
-        return findByCustomerId(id, null);
-    }
-
     public List<Order> findByCustomerId(int id, Pageable pageable) {
         String sql = """
                 SELECT orders.order_id AS id, orders.order_created_at, orders.order_finished_at, orders.order_status FROM orders
@@ -66,19 +62,45 @@ public class OrderJDBC {
         }
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> Order.builder()
-                        .id(rs.getInt("id"))
-                        .createAt(rs.getTimestamp("order_created_at"))
-                        .finishedAt(rs.getTimestamp("order_finished_at"))
-                        .orderStatus(orderStatusConverter.convertToEntityAttribute(rs.getInt("order_status")))
-                        .orderDetails(new HashSet<>(orderDetailJDBC.findByOrderId(rs.getInt("id"))))
-                        .build(),
-                id);
+                .id(rs.getInt("id"))
+                .createAt(rs.getTimestamp("order_created_at"))
+                .finishedAt(rs.getTimestamp("order_finished_at"))
+                .orderStatus(orderStatusConverter.convertToEntityAttribute(rs.getInt("order_status")))
+                .orderDetails(new HashSet<>(orderDetailJDBC.findByOrderId(rs.getInt("id"))))
+                .build(), id);
+    }
+
+    public List<Order> findByCustomerIdAndStatus(int id, int status, Pageable pageable) {
+        String sql = """
+                SELECT orders.order_id AS id, orders.order_created_at, orders.order_finished_at, orders.order_status FROM orders
+                    LEFT JOIN customers c on c.customer_id = orders.customer_id
+                WHERE c.customer_id = ? AND orders.order_status = ?
+                """;
+
+        if (pageable != null) {
+            int pageNumber = pageable.getPageNumber();
+            int pageSize = pageable.getPageSize();
+            int start = pageNumber * pageSize;
+
+            sql = new QueryBuilder.Builder()
+                    .select(sql)
+                    .sorted(pageable.getSort())
+                    .limit(start, pageSize)
+                    .build();
+        }
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> Order.builder()
+                .id(rs.getInt("id"))
+                .createAt(rs.getTimestamp("order_created_at"))
+                .finishedAt(rs.getTimestamp("order_finished_at"))
+                .orderStatus(orderStatusConverter.convertToEntityAttribute(rs.getInt("order_status")))
+                .orderDetails(new HashSet<>(orderDetailJDBC.findByOrderId(rs.getInt("id")))).build(), id, status);
     }
 
     public Optional<Order> findById(int id) {
         String sql = """
                 SELECT order_id as id, order_address_detail, order_consignee_name, order_created_at, order_finished_at, order_status, order_payment_method, order_phone, customer_id, district_id, province_id, ward_id FROM orders WHERE order_id = ?
-        """;
+                """;
         List<Order> orders = jdbcTemplate.query(sql, (rs, rowNum) -> Order.builder()
                 .id(rs.getInt("id"))
                 .customer(customerJDBC.findById(rs.getInt("customer_id")).orElse(null))

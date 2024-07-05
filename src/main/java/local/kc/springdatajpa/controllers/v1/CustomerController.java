@@ -27,6 +27,11 @@ public class CustomerController {
         return customerService.findById(id);
     }
 
+    @GetMapping("/lazy/{id}")
+    public ResponseEntity<?> findByIdLazy(@PathVariable(name = "id") int id) {
+        return customerService.findByIdLazy(id);
+    }
+
     @GetMapping("/count")
     public ResponseEntity<?> count() {
         return customerService.count();

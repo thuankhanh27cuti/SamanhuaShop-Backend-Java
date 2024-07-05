@@ -32,4 +32,9 @@ public class OrderDetailController {
     public ResponseEntity<?> countByOrderId(@PathVariable(name = "id") int id) {
         return orderDetailService.countByOrderId(id);
     }
+
+    @GetMapping("/revenues-of-customer/{id}")
+    public ResponseEntity<?> getRevenuesOfCustomerById(@PathVariable(name = "id") int id) {
+        return orderDetailService.getRevenuesOfCustomerById(id);
+    }
 }

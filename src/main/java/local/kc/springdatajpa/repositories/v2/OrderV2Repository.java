@@ -1,6 +1,7 @@
 package local.kc.springdatajpa.repositories.v2;
 
 import local.kc.springdatajpa.models.Order;
+import local.kc.springdatajpa.models.OrderStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -10,4 +11,11 @@ public interface OrderV2Repository extends JpaRepository<Order, Integer> {
 
     @Query("select SUM(od.price) from Order o LEFT JOIN o.orderDetails od where o.id = ?1")
     long findTotalPriceById(Integer orderId);
+
+    @Query("select count(o) from Order o where o.customer.id = ?1")
+    long countByCustomerId(int id);
+
+    @Query("select count(o) from Order o where o.customer.id = ?1 and o.orderStatus = ?2")
+    long countByCustomerIdAndOrderStatus(int id, OrderStatus orderStatus);
+
 }

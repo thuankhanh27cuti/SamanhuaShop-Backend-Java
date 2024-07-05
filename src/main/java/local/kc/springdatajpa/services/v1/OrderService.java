@@ -188,9 +188,33 @@ public class OrderService {
         if (order == null) {
             return ResponseEntity.ok().build();
         }
-        order.setOrderStatus(orderStatus);
 
-        saveOrderLog(id, orderStatus);
+        switch (order.getOrderStatus()) {
+            case WAIT_FOR_PAY -> {
+                if (orderStatus == OrderStatus.PENDING || orderStatus == OrderStatus.DECLINED) {
+                    order.setOrderStatus(orderStatus);
+                    saveOrderLog(id, orderStatus);
+                }
+            }
+            case PENDING -> {
+                if (orderStatus == OrderStatus.PREPARING) {
+                    order.setOrderStatus(orderStatus);
+                    saveOrderLog(id, orderStatus);
+                }
+            }
+            case PREPARING -> {
+                if (orderStatus == OrderStatus.SHIPPING) {
+                    order.setOrderStatus(orderStatus);
+                    saveOrderLog(id, orderStatus);
+                }
+            }
+            case SHIPPING -> {
+                if (orderStatus == OrderStatus.SUCCESS || orderStatus == OrderStatus.DECLINED) {
+                    order.setOrderStatus(orderStatus);
+                    saveOrderLog(id, orderStatus);
+                }
+            }
+        }
 
         orderRepository.save(order);
         return ResponseEntity.ok().build();
