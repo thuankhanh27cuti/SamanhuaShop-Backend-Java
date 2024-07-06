@@ -62,6 +62,11 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE)
     private Set<OrderLog> orderLogs;
 
+    public Order(Integer id, PaymentMethod paymentMethod) {
+        this.id = id;
+        this.paymentMethod = paymentMethod;
+    }
+
     public Order(Integer id, String consigneeName, String address, String phone, Date createAt, Date finishedAt, OrderStatus orderStatus) {
         this.id = id;
         this.consigneeName = consigneeName;

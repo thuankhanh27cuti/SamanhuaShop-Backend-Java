@@ -4,10 +4,7 @@ import local.kc.springdatajpa.services.v2.OrderV2Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v2/orders")
@@ -42,5 +39,10 @@ public class OrderV2Controller {
     @GetMapping("/count/by-customer/{id}/by-status/{status}")
     public ResponseEntity<?> countByCustomerIdAndStatusStatus(@PathVariable(name = "id") int id, @PathVariable(name = "status") int status) {
         return orderService.countByCustomerIdAndStatusStatus(id, status);
+    }
+
+    @PutMapping("/by-status/{id}")
+    public ResponseEntity<?> updateOrderStatus(@PathVariable(name = "id") int id, @RequestParam(name = "status") int status) {
+        return orderService.updateOrderStatus(id, status);
     }
 }

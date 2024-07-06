@@ -9,6 +9,7 @@ import local.kc.springdatajpa.repositories.v2.OrderV2Repository;
 import local.kc.springdatajpa.utils.PaymentRequest;
 import local.kc.springdatajpa.utils.PaymentResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.view.RedirectView;
@@ -31,6 +32,13 @@ public class PaymentService {
 
     public ResponseEntity<?> createPayment(PaymentRequest paymentRequest) {
         int orderId = paymentRequest.getOrderId();
+        Order order = orderRepository.findById(orderId).orElse(null);
+        if (order == null) {
+            return ResponseEntity.notFound().build();
+        }
+        else if (order.getOrderStatus() != OrderStatus.WAIT_FOR_PAY) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
 
         long amount = orderRepository.findTotalPriceById(orderId) * 100;
         String vnp_IpAddr = paymentRequest.getIdAddress();

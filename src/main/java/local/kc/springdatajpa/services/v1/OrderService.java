@@ -7,6 +7,7 @@ import local.kc.springdatajpa.repositories.v1.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -182,42 +183,29 @@ public class OrderService {
     }
 
     public ResponseEntity<?> updateOrderStatus(int id, int status) {
-        OrderStatus orderStatus = orderStatusConverter.convertToEntityAttribute(status);
-
         Order order = orderRepository.findById(id).orElse(null);
         if (order == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        OrderStatus orderStatus = orderStatusConverter.convertToEntityAttribute(status);
+
+        boolean isUpdated = switch (order.getOrderStatus()) {
+            case WAIT_FOR_PAY -> orderStatus == OrderStatus.PENDING || orderStatus == OrderStatus.DECLINED;
+            case PENDING -> orderStatus == OrderStatus.PREPARING;
+            case PREPARING -> orderStatus == OrderStatus.SHIPPING;
+            case SHIPPING -> orderStatus == OrderStatus.SUCCESS || orderStatus == OrderStatus.DECLINED;
+            default -> false;
+        };
+
+        if (isUpdated) {
+            order.setOrderStatus(orderStatus);
+            saveOrderLog(id, orderStatus);
+            orderRepository.save(order);
             return ResponseEntity.ok().build();
         }
 
-        switch (order.getOrderStatus()) {
-            case WAIT_FOR_PAY -> {
-                if (orderStatus == OrderStatus.PENDING || orderStatus == OrderStatus.DECLINED) {
-                    order.setOrderStatus(orderStatus);
-                    saveOrderLog(id, orderStatus);
-                }
-            }
-            case PENDING -> {
-                if (orderStatus == OrderStatus.PREPARING) {
-                    order.setOrderStatus(orderStatus);
-                    saveOrderLog(id, orderStatus);
-                }
-            }
-            case PREPARING -> {
-                if (orderStatus == OrderStatus.SHIPPING) {
-                    order.setOrderStatus(orderStatus);
-                    saveOrderLog(id, orderStatus);
-                }
-            }
-            case SHIPPING -> {
-                if (orderStatus == OrderStatus.SUCCESS || orderStatus == OrderStatus.DECLINED) {
-                    order.setOrderStatus(orderStatus);
-                    saveOrderLog(id, orderStatus);
-                }
-            }
-        }
-
-        orderRepository.save(order);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     private void saveOrderLog(Integer orderId, OrderStatus orderStatus) {
