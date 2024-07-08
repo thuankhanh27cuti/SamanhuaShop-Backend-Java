@@ -103,19 +103,21 @@ public class PaymentService {
         );
     }
 
-    public RedirectView updateOrderStatus(int orderId) {
-        orderRepository.findById(orderId).ifPresent(order -> {
-            order.setOrderStatus(OrderStatus.PENDING);
-            orderRepository.save(order);
+    public RedirectView updateOrderStatus(int orderId, String responseCode) {
+        if (responseCode.equals("00")) {
+            orderRepository.findById(orderId).ifPresent(order -> {
+                order.setOrderStatus(OrderStatus.PENDING);
+                orderRepository.save(order);
 
-            OrderLog orderLog = OrderLog.builder()
-                    .time(new Date())
-                    .order(new Order(orderId))
-                    .description("Đặt hàng thành công")
-                    .build();
+                OrderLog orderLog = OrderLog.builder()
+                        .time(new Date())
+                        .order(new Order(orderId))
+                        .description("Đặt hàng thành công")
+                        .build();
 
-            orderLogRepository.save(orderLog);
-        });
+                orderLogRepository.save(orderLog);
+            });
+        }
         return new RedirectView("http://localhost:4200/orders");
     }
 }

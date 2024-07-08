@@ -23,7 +23,7 @@ public class PaymentController {
     }
 
     @GetMapping("/payment-success")
-    public RedirectView updateOrderStatus(@RequestParam(name = "vnp_TxnRef") int orderId) {
-        return paymentService.updateOrderStatus(orderId);
+    public RedirectView updateOrderStatus(@RequestParam(name = "vnp_TxnRef") int orderId, @RequestParam(name = "vnp_ResponseCode") String responseCode) {
+        return paymentService.updateOrderStatus(orderId, responseCode);
     }
 }
