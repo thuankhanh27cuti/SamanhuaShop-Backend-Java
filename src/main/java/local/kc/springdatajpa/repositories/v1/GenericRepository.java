@@ -2,7 +2,11 @@ package local.kc.springdatajpa.repositories.v1;
 
 import local.kc.springdatajpa.models.Book;
 import local.kc.springdatajpa.utils.*;
-import local.kc.springdatajpa.utils.RevenueByHour;
+import local.kc.springdatajpa.utils.chart.ChartByDate;
+import local.kc.springdatajpa.utils.chart.ChartByHour;
+import local.kc.springdatajpa.utils.chart.ChartByMonth;
+import local.kc.springdatajpa.utils.chart.ChartByYear;
+import local.kc.springdatajpa.utils.statistical.StatisticalByDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -74,43 +78,43 @@ public class GenericRepository {
                 .build());
     }
 
-    public List<RevenueByDate> getRevenueByWeek() {
+    public List<ChartByDate> getRevenueByWeek() {
         String sql = """
                 SELECT CAST(order_created_at AS DATE ) AS date, SUM(order_total_price) AS revenue FROM orders
                    LEFT JOIN order_detail od on orders.order_id = od.order_id
                 WHERE CAST(order_created_at AS DATE ) BETWEEN DATE_SUB(CURRENT_DATE, INTERVAL 7 DAY ) AND CURRENT_DATE
                 GROUP BY date;
                 """;
-        return jdbcTemplate.query(sql, (rs, rowNum) -> RevenueByDate.builder()
+        return jdbcTemplate.query(sql, (rs, rowNum) -> ChartByDate.builder()
                 .revenue(rs.getInt("revenue"))
                 .date(rs.getDate("date"))
                 .build());
     }
 
-    public List<RevenueByDate> getRevenueByMonth(int month, int year) {
+    public List<ChartByDate> getRevenueByMonth(int month, int year) {
         String sql = """
                 SELECT CAST(order_created_at AS DATE ) as date , SUM(order_total_price) as totalPrice FROM orders o
                     LEFT JOIN order_detail od on o.order_id = od.order_id
                 WHERE MONTH(order_created_at) = ? AND YEAR(order_created_at) = ?
                 GROUP BY date;
         """;
-        return jdbcTemplate.query(sql, (rs, rowNum) -> new RevenueByDate(rs.getDate("date"), rs.getInt("totalPrice")), month, year);
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new ChartByDate(rs.getDate("date"), rs.getInt("totalPrice")), month, year);
     }
 
-    public List<RevenueByHour> getRevenueByDate(LocalDate date) {
+    public List<ChartByHour> getRevenueByDate(LocalDate date) {
         String sql = """
             SELECT HOUR(order_created_at) as hour, SUM(order_total_price) as revenue FROM orders o
             LEFT JOIN order_detail od on o.order_id = od.order_id
             WHERE CAST(order_created_at as DATE) = ?
             GROUP BY HOUR(order_created_at);
         """;
-        return jdbcTemplate.query(sql, (rs, rowNum) -> RevenueByHour.builder()
+        return jdbcTemplate.query(sql, (rs, rowNum) -> ChartByHour.builder()
                 .hour(rs.getInt("hour"))
                 .revenue(rs.getInt("revenue"))
                 .build(), date.toString());
     }
 
-    public List<RevenueByMonth> getRevenueByYear(int year) {
+    public List<ChartByMonth> getRevenueByYear(int year) {
         String sql = """
         SELECT MONTH(order_created_at) as month, YEAR(order_created_at) as year, SUM(order_total_price) as totalPrice
         FROM orders
@@ -118,22 +122,61 @@ public class GenericRepository {
         WHERE YEAR(order_created_at) = ?
         GROUP BY month, year;
         """;
-        return jdbcTemplate.query(sql, ((rs, rowNum) -> RevenueByMonth.builder()
+        return jdbcTemplate.query(sql, ((rs, rowNum) -> ChartByMonth.builder()
                 .month(rs.getInt("month"))
                 .year(rs.getInt("year"))
                 .revenue(rs.getInt("totalPrice"))
                 .build()), year);
     }
 
-    public List<RevenueByYear> getRevenueAllTime() {
+    public List<ChartByYear> getRevenueAllTime() {
         String sql = """
             SELECT YEAR(order_created_at) as year, SUM(order_total_price) as revenue FROM orders
             LEFT JOIN order_detail od on orders.order_id = od.order_id
             GROUP BY year;
         """;
-        return jdbcTemplate.query(sql, (rs, rowNum) -> RevenueByYear.builder()
+        return jdbcTemplate.query(sql, (rs, rowNum) -> ChartByYear.builder()
                 .year(rs.getInt("year"))
                 .revenue(rs.getInt("revenue"))
+                .build());
+    }
+
+    public List<StatisticalByDate> getStatisticalRevenueByDate(LocalDate date) {
+        String sql = """
+        SELECT orders.order_id, orders.order_finished_at, SUM(od.order_total_price) AS sum FROM orders LEFT JOIN order_detail od on orders.order_id = od.order_id WHERE order_status = 4 AND DATE (order_finished_at) = ? GROUP BY orders.order_id;
+        """;
+        return jdbcTemplate.query(sql, (rs, rowNum) -> StatisticalByDate.builder()
+                .id(rs.getInt("order_id"))
+                .finishedAt(rs.getTimestamp("order_finished_at"))
+                .sum(rs.getLong("sum"))
+                .build(), date.toString());
+    }
+
+    public List<ChartByDate> getStatisticalRevenueByMonth(int month, int year) {
+        String sql = """
+            SELECT DATE(order_finished_at) AS date, SUM(od.order_total_price) AS revenue FROM orders LEFT JOIN order_detail od on orders.order_id = od.order_id WHERE order_status = 4 AND MONTH(order_finished_at) = ? AND YEAR(order_finished_at) = ? GROUP BY date;
+        """;
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new ChartByDate(rs.getDate("date"), rs.getInt("revenue")), month, year);
+    }
+
+    public List<ChartByMonth> getStatisticalRevenueByYear(int year) {
+        String sql = """
+            SELECT MONTH(order_finished_at) AS month, YEAR(order_finished_at) AS year, SUM(od.order_total_price) AS totalPrice FROM orders LEFT JOIN order_detail od on orders.order_id = od.order_id WHERE YEAR(order_finished_at) = ? AND order_status = 4 GROUP BY month, year;
+        """;
+        return jdbcTemplate.query(sql, ((rs, rowNum) -> ChartByMonth.builder()
+                .month(rs.getInt("month"))
+                .year(rs.getInt("year"))
+                .revenue(rs.getInt("totalPrice"))
+                .build()), year);
+    }
+
+    public Object getStatisticalRevenueAllTime() {
+        String sql = """
+            SELECT YEAR(order_finished_at) as year, SUM(od.order_total_price) as totalPrice FROM orders LEFT JOIN order_detail od on orders.order_id = od.order_id WHERE order_status = 4 GROUP BY year;
+        """;
+        return jdbcTemplate.query(sql, (rs, rowNum) -> ChartByYear.builder()
+                .year(rs.getInt("year"))
+                .revenue(rs.getInt("totalPrice"))
                 .build());
     }
 }

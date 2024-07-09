@@ -40,6 +40,11 @@ public class AdminController {
         return adminService.getBookStatus();
     }
 
+    @GetMapping("/out-of-stock")
+    public ResponseEntity<?> getOptionOutOfStock(Pageable pageable) {
+        return adminService.getOptionOutOfStock(pageable);
+    }
+
     @GetMapping("/today-featured")
     public ResponseEntity<?> getTodayFeatured() {
         return adminService.getTodayFeatured();
@@ -48,6 +53,26 @@ public class AdminController {
     @GetMapping("/revenue-by-date")
     public ResponseEntity<?> getRevenueByDate(@RequestParam(name = "date") LocalDate date) {
         return adminService.getRevenueByDate(date);
+    }
+
+    @GetMapping("/statistical/revenue-by-date")
+    public ResponseEntity<?> getStatisticalRevenueByDate(@RequestParam(name = "date") LocalDate date) {
+        return adminService.getStatisticalRevenueByDate(date);
+    }
+
+    @GetMapping("/statistical/revenue-by-month")
+    public ResponseEntity<?> getStatisticalRevenueByMonth(@RequestParam(name = "month") int month, @RequestParam(name = "year") int year) {
+        return adminService.getStatisticalRevenueByMonth(month, year);
+    }
+
+    @GetMapping("/statistical/revenue-by-year")
+    public ResponseEntity<?> getStatisticalRevenueByYear(@RequestParam(name = "year") int year) {
+        return adminService.getStatisticalRevenueByYear(year);
+    }
+
+    @GetMapping("/statistical/revenue-all-time")
+    public ResponseEntity<?> getStatisticalRevenueAllTime() {
+        return adminService.getStatisticalRevenueAllTime();
     }
 
     @GetMapping("/revenue-by-week")

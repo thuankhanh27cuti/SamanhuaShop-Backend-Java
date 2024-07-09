@@ -1,4 +1,4 @@
-package local.kc.springdatajpa.utils;
+package local.kc.springdatajpa.utils.base64;
 
 import lombok.*;
 

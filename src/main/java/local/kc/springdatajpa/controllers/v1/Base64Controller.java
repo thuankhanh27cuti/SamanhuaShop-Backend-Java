@@ -1,7 +1,7 @@
 package local.kc.springdatajpa.controllers.v1;
 
 import local.kc.springdatajpa.services.v1.Base64Service;
-import local.kc.springdatajpa.utils.Base64Request;
+import local.kc.springdatajpa.utils.base64.Base64Request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

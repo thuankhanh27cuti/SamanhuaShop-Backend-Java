@@ -1,7 +1,7 @@
 package local.kc.springdatajpa.services.v1;
 
-import local.kc.springdatajpa.utils.Base64Request;
-import local.kc.springdatajpa.utils.Base64Response;
+import local.kc.springdatajpa.utils.base64.Base64Request;
+import local.kc.springdatajpa.utils.base64.Base64Response;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package local.kc.springdatajpa.utils;
+package local.kc.springdatajpa.utils.chart;
 
 import lombok.*;
 
@@ -8,8 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RevenueByMonth {
-    public int month;
+public class ChartByYear {
     public int year;
     public int revenue;
 }

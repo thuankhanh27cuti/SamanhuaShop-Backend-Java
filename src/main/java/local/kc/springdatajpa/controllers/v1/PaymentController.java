@@ -1,7 +1,7 @@
 package local.kc.springdatajpa.controllers.v1;
 
 import local.kc.springdatajpa.services.v1.PaymentService;
-import local.kc.springdatajpa.utils.PaymentRequest;
+import local.kc.springdatajpa.utils.payment.PaymentRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

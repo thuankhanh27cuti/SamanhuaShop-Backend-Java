@@ -201,6 +201,11 @@ public class OrderService {
         if (isUpdated) {
             order.setOrderStatus(orderStatus);
             saveOrderLog(id, orderStatus);
+
+            if (orderStatus == OrderStatus.SUCCESS || orderStatus == OrderStatus.DECLINED) {
+                order.setFinishedAt(new Date());
+            }
+
             orderRepository.save(order);
             return ResponseEntity.ok().build();
         }

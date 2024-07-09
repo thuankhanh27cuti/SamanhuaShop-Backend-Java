@@ -1,4 +1,4 @@
-package local.kc.springdatajpa.utils;
+package local.kc.springdatajpa.utils.chart;
 
 import lombok.*;
 
@@ -10,7 +10,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RevenueByDate {
+public class ChartByDate {
     public Date date;
     public int revenue;
 }

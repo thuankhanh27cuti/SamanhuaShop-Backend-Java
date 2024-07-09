@@ -22,4 +22,7 @@ public interface OptionRepository extends JpaRepository<Option, Integer> {
 
     @Query("SELECT COUNT(o) FROM Option o WHERE o.book.id = ?1")
     long countByBookId(Integer id);
+
+    @Query("SELECT new Option(o.id, o.name, o.quantity, o.image) FROM Option o ORDER BY o.quantity ASC")
+    List<Option> findAllOptionQuantityAsc(Pageable pageable);
 }
