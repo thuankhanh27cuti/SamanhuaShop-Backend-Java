@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -89,9 +88,6 @@ public class AdminService {
                 .map(option -> {
                     Book book = bookRepository.findByOptionId(option.getId()).orElse(null);
                     if (book != null) {
-                        book.setCategories(new HashSet<>());
-                        book.setOptions(new HashSet<>());
-                        book.setImages(new HashSet<>());
                         book.setOptions(Set.of(option));
                     }
                     return book;
@@ -116,5 +112,41 @@ public class AdminService {
 
     public ResponseEntity<?> getStatisticalRevenueAllTime() {
         return ResponseEntity.ok(genericRepository.getStatisticalRevenueAllTime());
+    }
+
+    public ResponseEntity<?> getCountOptionOutOfStock() {
+        return ResponseEntity.ok(optionRepository.countByQuantityLessThanEqual(10));
+    }
+
+    public ResponseEntity<?> getCountValuableCustomer() {
+        return ResponseEntity.ok(genericRepository.getCountValuableCustomer());
+    }
+
+    public ResponseEntity<?> getStatisticalRevenueByProvince() {
+        return ResponseEntity.ok(genericRepository.getStatisticalRevenueByProvince());
+    }
+
+    public ResponseEntity<?> getStatisticalRevenueByDistrict(int provinceId) {
+        return ResponseEntity.ok(genericRepository.getStatisticalRevenueByDistrict(provinceId));
+    }
+
+    public ResponseEntity<?> getStatisticalRevenueByWard(int districtId) {
+        return ResponseEntity.ok(genericRepository.getStatisticalRevenueByWard(districtId));
+    }
+
+    public ResponseEntity<?> getChartUserProvince() {
+        return ResponseEntity.ok(genericRepository.getChartUserProvince());
+    }
+
+    public ResponseEntity<?> getChartUserDistrict(int provinceId) {
+        return ResponseEntity.ok(genericRepository.getChartUserDistrict(provinceId));
+    }
+
+    public ResponseEntity<?> getChartUserWard(int districtId) {
+        return ResponseEntity.ok(genericRepository.getChartUserWard(districtId));
+    }
+
+    public ResponseEntity<?> getChartRevenueByCategory() {
+        return ResponseEntity.ok(genericRepository.getChartRevenueByCategory());
     }
 }

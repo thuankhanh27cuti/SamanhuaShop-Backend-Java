@@ -22,15 +22,17 @@ public class OrderService {
     private final OrderLogRepository orderLogRepository;
     private final CustomerRepository customerRepository;
     private final OrderStatusConverter orderStatusConverter;
+    private final OptionRepository optionRepository;
 
     @Autowired
-    public OrderService(OrderRepository orderRepository, ModelMapper modelMapper, OrderDetailRepository orderDetailRepository, OrderLogRepository orderLogRepository, CustomerRepository customerRepository) {
+    public OrderService(OrderRepository orderRepository, ModelMapper modelMapper, OrderDetailRepository orderDetailRepository, OrderLogRepository orderLogRepository, CustomerRepository customerRepository, OptionRepository optionRepository) {
         this.orderRepository = orderRepository;
         this.modelMapper = modelMapper;
         this.orderDetailRepository = orderDetailRepository;
         this.orderLogRepository = orderLogRepository;
         this.customerRepository = customerRepository;
         this.orderStatusConverter = new OrderStatusConverter();
+        this.optionRepository = optionRepository;
     }
 
     public ResponseEntity<?> findAll(Pageable pageable) {
@@ -98,6 +100,14 @@ public class OrderService {
                     .price(orderDetail.getPrice())
                     .quantity(orderDetail.getQuantity())
                     .build();
+
+            Option option = optionRepository.findById(optionId).orElse(null);
+            if (option != null) {
+                int quantity = option.getQuantity();
+                option.setQuantity(quantity - orderDetail.getQuantity());
+                optionRepository.save(option);
+            }
+
             orderDetailRepository.save(orderDetail1);
         });
 

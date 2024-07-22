@@ -20,7 +20,7 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
     @Query("SELECT new Book(b.id, b.name, b.image, b.price, b.description, b.createAt) FROM Book b LEFT JOIN b.categories c WHERE c.id = ?1")
     List<Book> findByCategoryIdLazy(int categoryId, Pageable pageable);
 
-    @Query("SELECT b FROM Book b RIGHT JOIN FETCH b.options o WHERE o.id = ?1")
+    @Query("SELECT new Book(b.id, b.name, b.image, b.price, b.description, b.createAt) FROM Book b LEFT JOIN b.options o WHERE o.id = ?1")
     Optional<Book> findByOptionId(int id);
 
     @Query("SELECT COUNT(b) FROM Book b INNER JOIN b.categories c WHERE c.id = ?1")

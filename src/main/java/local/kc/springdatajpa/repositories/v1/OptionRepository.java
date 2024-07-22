@@ -25,4 +25,7 @@ public interface OptionRepository extends JpaRepository<Option, Integer> {
 
     @Query("SELECT new Option(o.id, o.name, o.quantity, o.image) FROM Option o ORDER BY o.quantity ASC")
     List<Option> findAllOptionQuantityAsc(Pageable pageable);
+
+    @Query("SELECT COUNT (o) FROM Option o WHERE o.quantity <= ?1")
+    long countByQuantityLessThanEqual(Integer quantity);
 }

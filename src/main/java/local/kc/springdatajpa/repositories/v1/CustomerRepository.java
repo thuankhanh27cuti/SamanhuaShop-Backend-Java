@@ -32,4 +32,7 @@ public interface CustomerRepository extends JpaRepository<Customer, Integer> {
 
     @Query("select COUNT(c) from Customer c where c.role = ?1")
     long countByRole(Role role);
+
+    @Query("select count(c) from Customer c where c.username = ?1")
+    long countByUsername(String username);
 }

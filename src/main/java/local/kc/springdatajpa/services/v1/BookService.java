@@ -3,8 +3,10 @@ package local.kc.springdatajpa.services.v1;
 import local.kc.springdatajpa.dtos.BookDTO;
 import local.kc.springdatajpa.models.Book;
 import local.kc.springdatajpa.models.Category;
+import local.kc.springdatajpa.models.Option;
 import local.kc.springdatajpa.repositories.v1.BookRepository;
 import local.kc.springdatajpa.repositories.v1.ImageRepository;
+import local.kc.springdatajpa.repositories.v1.OptionRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -22,12 +24,14 @@ public class BookService {
     private final BookRepository bookRepository;
     private final ImageRepository imageRepository;
     private final ModelMapper modelMapper;
+    private final OptionRepository optionRepository;
 
     @Autowired
-    public BookService(BookRepository bookRepository, ImageRepository imageRepository, ModelMapper modelMapper) {
+    public BookService(BookRepository bookRepository, ImageRepository imageRepository, ModelMapper modelMapper, OptionRepository optionRepository) {
         this.bookRepository = bookRepository;
         this.imageRepository = imageRepository;
         this.modelMapper = modelMapper;
+        this.optionRepository = optionRepository;
     }
 
     public ResponseEntity<?> findAll(Pageable pageable) {
@@ -53,14 +57,16 @@ public class BookService {
 
 
     public ResponseEntity<?> findByOptionId(int optionId) {
+        Option option = optionRepository.findByIdLazy(optionId).orElse(null);
+        if (option == null) {
+            return ResponseEntity.notFound().build();
+        }
+
         return ResponseEntity.of(bookRepository.findByOptionId(optionId)
                 .map(book -> {
-                            book.setCategories(new HashSet<>());
-                            book.setImages(new HashSet<>());
-                            book.setOptions(book.getOptions().stream().peek(option -> option.setOrdersDetails(new HashSet<>())).collect(Collectors.toSet()));
-                            return book;
-                        }
-                )
+                    book.setOptions(new HashSet<>(Set.of(option)));
+                    return book;
+                })
                 .map(book -> modelMapper.map(book, BookDTO.class)));
     }
 

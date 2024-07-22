@@ -44,12 +44,21 @@ public class AuthenticationService {
     }
 
     public ResponseEntity<?> register(CustomerDTO customerDTO) {
-        Customer customer = modelMapper.map(customerDTO, Customer.class);
-        customer.setPassword(passwordEncoder.encode(customerDTO.getPassword()));
-        customer.setRole(Role.USER);
-        customerRepository.save(customer);
-        String jwtToken = jwtService.generateToken(customer);
-        return ResponseEntity.ok(this.generateAuthenticationResponse(jwtToken, customer));
+        String username = customerDTO.getUsername();
+        if (customerRepository.countByUsername(username) == 0) {
+            Customer customer = modelMapper.map(customerDTO, Customer.class);
+            customer.setImage("/images/image-placeholder.jpg");
+            customer.setPassword(passwordEncoder.encode(customerDTO.getPassword()));
+            customer.setRole(Role.USER);
+            customer.setDeleted(false);
+            Customer c = customerRepository.save(customer);
+            String jwtToken = jwtService.generateToken(c);
+            return ResponseEntity.ok(this.generateAuthenticationResponse(jwtToken, c));
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
     }
 
     public ResponseEntity<?> authenticate(AuthenticationRequest request) {
