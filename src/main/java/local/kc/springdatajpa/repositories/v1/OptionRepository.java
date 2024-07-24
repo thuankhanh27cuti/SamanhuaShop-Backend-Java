@@ -28,4 +28,7 @@ public interface OptionRepository extends JpaRepository<Option, Integer> {
 
     @Query("SELECT COUNT (o) FROM Option o WHERE o.quantity <= ?1")
     long countByQuantityLessThanEqual(Integer quantity);
+
+    @Query("SELECT o FROM Option o INNER JOIN o.ordersDetails od WHERE od.order.id = ?1")
+    List<Option> findByOrdersDetails_Order_Id(Integer id);
 }

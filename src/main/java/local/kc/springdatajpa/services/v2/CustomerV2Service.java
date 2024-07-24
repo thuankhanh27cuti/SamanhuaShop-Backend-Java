@@ -70,7 +70,12 @@ public class CustomerV2Service {
         customer.setImage(customerDTO.getImage());
         customer.setPhone(customerDTO.getPhone());
         customer.setBirthday(customerDTO.getBirthday());
-        customer.setWard(new Ward(customerDTO.getWard().getCode()));
+        if (customerDTO.getWard() != null) {
+            customer.setWard(new Ward(customerDTO.getWard().getCode()));
+        }
+        else {
+            customer.setWard(null);
+        }
         customerRepository.save(customer);
 
         return ResponseEntity.ok().build();

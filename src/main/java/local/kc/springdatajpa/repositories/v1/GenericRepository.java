@@ -17,7 +17,6 @@ import java.util.List;
 public class GenericRepository {
     private final JdbcTemplate jdbcTemplate;
 
-
     @Autowired
     public GenericRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -77,9 +76,9 @@ public class GenericRepository {
 
     public List<ChartByDate> getRevenueByWeek() {
         String sql = """
-                SELECT CAST(order_created_at AS DATE ) AS date, SUM(order_total_price) AS revenue FROM orders
+                SELECT CAST(order_finished_at AS DATE ) AS date, SUM(order_total_price) AS revenue FROM orders
                    LEFT JOIN order_detail od on orders.order_id = od.order_id
-                WHERE CAST(order_created_at AS DATE ) BETWEEN DATE_SUB(CURRENT_DATE, INTERVAL 7 DAY ) AND CURRENT_DATE AND order_status = 4
+                WHERE CAST(order_finished_at AS DATE ) BETWEEN DATE_SUB(CURRENT_DATE, INTERVAL 7 DAY ) AND CURRENT_DATE AND order_status = 4
                 GROUP BY date;
                 """;
         return jdbcTemplate.query(sql, (rs, rowNum) -> ChartByDate.builder()
@@ -90,9 +89,9 @@ public class GenericRepository {
 
     public List<ChartByDate> getRevenueByMonth(int month, int year) {
         String sql = """
-                SELECT CAST(order_created_at AS DATE ) as date , SUM(order_total_price) as totalPrice FROM orders o
+                SELECT CAST(order_finished_at AS DATE ) as date , SUM(order_total_price) as totalPrice FROM orders o
                     LEFT JOIN order_detail od on o.order_id = od.order_id
-                WHERE MONTH(order_created_at) = ? AND YEAR(order_created_at) = ? AND order_status = 4
+                WHERE MONTH(order_finished_at) = ? AND YEAR(order_finished_at) = ? AND order_status = 4
                 GROUP BY date;
         """;
         return jdbcTemplate.query(sql, (rs, rowNum) -> new ChartByDate(rs.getDate("date"), rs.getInt("totalPrice")), month, year);
@@ -100,10 +99,10 @@ public class GenericRepository {
 
     public List<ChartByHour> getRevenueByDate(LocalDate date) {
         String sql = """
-            SELECT HOUR(order_created_at) as hour, SUM(order_total_price) as revenue FROM orders o
+            SELECT HOUR(order_finished_at) as hour, SUM(order_total_price) as revenue FROM orders o
             LEFT JOIN order_detail od on o.order_id = od.order_id
-            WHERE CAST(order_created_at as DATE) = ? AND order_status = 4
-            GROUP BY HOUR(order_created_at);
+            WHERE CAST(order_finished_at as DATE) = ? AND order_status = 4
+            GROUP BY HOUR(order_finished_at);
         """;
         return jdbcTemplate.query(sql, (rs, rowNum) -> ChartByHour.builder()
                 .hour(rs.getInt("hour"))
@@ -113,10 +112,10 @@ public class GenericRepository {
 
     public List<ChartByMonth> getRevenueByYear(int year) {
         String sql = """
-        SELECT MONTH(order_created_at) as month, YEAR(order_created_at) as year, SUM(order_total_price) as totalPrice
+        SELECT MONTH(order_finished_at) as month, YEAR(order_finished_at) as year, SUM(order_total_price) as totalPrice
         FROM orders
             LEFT JOIN order_detail od on orders.order_id = od.order_id
-        WHERE YEAR(order_created_at) = ? AND order_status = 4
+        WHERE YEAR(order_finished_at) = ? AND order_status = 4
         GROUP BY month, year;
         """;
         return jdbcTemplate.query(sql, ((rs, rowNum) -> ChartByMonth.builder()
@@ -128,7 +127,7 @@ public class GenericRepository {
 
     public List<ChartByYear> getRevenueAllTime() {
         String sql = """
-            SELECT YEAR(order_created_at) as year, SUM(order_total_price) as revenue FROM orders
+            SELECT YEAR(order_finished_at) as year, SUM(order_total_price) as revenue FROM orders
             LEFT JOIN order_detail od on orders.order_id = od.order_id
             WHERE order_status = 4
             GROUP BY year;

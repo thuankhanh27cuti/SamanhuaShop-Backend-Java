@@ -17,8 +17,8 @@ public class OrderV2Controller {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> findById(@PathVariable(name = "id") int id) {
-        return orderService.findById(id);
+    public ResponseEntity<?> findById(@PathVariable(name = "id") int id, @RequestHeader(name = "Authorization") String authorization) {
+        return orderService.findById(id, authorization);
     }
 
     @GetMapping("/by-customer/{id}")

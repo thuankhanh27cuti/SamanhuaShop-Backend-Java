@@ -11,8 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashSet;
+import java.util.*;
 
 @Service
 public class OrderService {
@@ -90,6 +89,19 @@ public class OrderService {
     public ResponseEntity<?> saveOrder(OrderDTO orderDTO) {
         Order order = modelMapper.map(orderDTO, Order.class);
         order.setCreateAt(new Date());
+        List<Option> options = new ArrayList<>();
+
+        boolean allMatch = order.getOrderDetails().stream().allMatch(orderDetail -> {
+            Integer optionId = orderDetail.getOrderDetailId().getOptionId();
+            Option option = optionRepository.findById(optionId).orElse(null);
+            options.add(option);
+            return option != null && option.getQuantity() >= orderDetail.getQuantity();
+        });
+
+        if (!allMatch) {
+            return ResponseEntity.badRequest().build();
+        }
+
         Integer orderId = orderRepository.save(order).getId();
         order.getOrderDetails().forEach(orderDetail -> {
             Integer optionId = orderDetail.getOrderDetailId().getOptionId();
@@ -101,13 +113,14 @@ public class OrderService {
                     .quantity(orderDetail.getQuantity())
                     .build();
 
-            Option option = optionRepository.findById(optionId).orElse(null);
-            if (option != null) {
-                int quantity = option.getQuantity();
-                option.setQuantity(quantity - orderDetail.getQuantity());
-                optionRepository.save(option);
-            }
-
+            options.stream()
+                    .filter(option -> option.getId().equals(optionId))
+                    .findFirst()
+                    .ifPresent(option -> {
+                        int quantity = option.getQuantity();
+                        option.setQuantity(quantity - orderDetail.getQuantity());
+                        optionRepository.save(option);
+                    });
             orderDetailRepository.save(orderDetail1);
         });
 
@@ -199,6 +212,7 @@ public class OrderService {
         }
 
         OrderStatus orderStatus = orderStatusConverter.convertToEntityAttribute(status);
+        System.out.println(orderStatus);
 
         boolean isUpdated = switch (order.getOrderStatus()) {
             case WAIT_FOR_PAY -> orderStatus == OrderStatus.PENDING || orderStatus == OrderStatus.DECLINED;
@@ -214,6 +228,15 @@ public class OrderService {
 
             if (orderStatus == OrderStatus.SUCCESS || orderStatus == OrderStatus.DECLINED) {
                 order.setFinishedAt(new Date());
+            }
+
+            if (orderStatus == OrderStatus.DECLINED) {
+                Set<OrderDetail> orderDetails = orderDetailRepository.findByOrderId(id);
+                orderDetails.forEach(orderDetail -> {
+                    Option option = orderDetail.getOption();
+                    option.setQuantity(option.getQuantity() + orderDetail.getQuantity());
+                    optionRepository.save(option);
+                });
             }
 
             orderRepository.save(order);

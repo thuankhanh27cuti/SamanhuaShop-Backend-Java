@@ -97,9 +97,9 @@ public class OrderJDBC {
                 .orderDetails(new HashSet<>(orderDetailJDBC.findByOrderId(rs.getInt("id")))).build(), id, status);
     }
 
-    public Optional<Order> findById(int id) {
+    public Optional<Order> findById(int id, Integer customerId) {
         String sql = """
-                SELECT order_id as id, order_address_detail, order_consignee_name, order_created_at, order_finished_at, order_status, order_payment_method, order_phone, customer_id, district_id, province_id, ward_id FROM orders WHERE order_id = ?
+                SELECT order_id as id, order_address_detail, order_consignee_name, order_created_at, order_finished_at, order_status, order_payment_method, order_phone, customer_id, district_id, province_id, ward_id FROM orders WHERE order_id = ? AND customer_id = ?
                 """;
         List<Order> orders = jdbcTemplate.query(sql, (rs, rowNum) -> Order.builder()
                 .id(rs.getInt("id"))
@@ -116,7 +116,7 @@ public class OrderJDBC {
                 .district(districtRepository.findByIdLazy(rs.getInt("district_id")).orElse(null))
                 .province(provinceRepository.findByIdLazy(rs.getInt("province_id")).orElse(null))
                 .orderLogs(new HashSet<>(orderLogRepository.findByOrderId(rs.getInt("id"))))
-                .build(), id);
+                .build(), id, customerId);
         return orders.isEmpty() ? Optional.empty() : Optional.of(orders.get(0));
     }
 }
