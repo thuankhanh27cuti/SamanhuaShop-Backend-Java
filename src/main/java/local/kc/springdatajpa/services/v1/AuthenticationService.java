@@ -47,6 +47,9 @@ public class AuthenticationService {
         String username = customerDTO.getUsername();
         if (customerRepository.countByUsername(username) == 0) {
             Customer customer = modelMapper.map(customerDTO, Customer.class);
+            customer.setName("");
+            customer.setGender("");
+            customer.setPhone("");
             customer.setImage("/images/image-placeholder.jpg");
             customer.setPassword(passwordEncoder.encode(customerDTO.getPassword()));
             customer.setRole(Role.USER);

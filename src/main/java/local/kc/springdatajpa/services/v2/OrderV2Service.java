@@ -93,6 +93,7 @@ public class OrderV2Service {
         if (order.getOrderStatus() == OrderStatus.WAIT_FOR_PAY || order.getOrderStatus() == OrderStatus.PENDING) {
             if (orderStatus == OrderStatus.DECLINED) {
                 order.setOrderStatus(orderStatus);
+                order.setFinishedAt(new Date());
                 OrderLog orderLog = OrderLog.builder()
                         .time(new Date())
                         .order(new Order(id))
